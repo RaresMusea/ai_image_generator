@@ -1,0 +1,13 @@
+services:
+  stable-diffusion-web-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7860:7860"
+      - "7861:7861"
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    runtime: nvidia
+    volumes:
+      - /app

@@ -1,13 +1,5 @@
 import { GeneratorComponent } from "@/components/generator/GeneratorComponent"
 
-export type GeneratedImage = {
-  id: string
-  url: string
-  prompt: string
-  timestamp: Date
-  size: string
-}
-
 export default function ImageGeneratorPage() {
   // const [prompt, setPrompt] = useState<string | undefined>("");
   // const [size, setSize] = useState<string | undefined>("1024x1024");
