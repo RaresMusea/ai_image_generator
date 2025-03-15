@@ -1,5 +1,4 @@
 import { ModeToggle } from "@/components/themes/ModeToggle";
-import { ThemeProvider } from "@/components/themes/theme-provider";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { ReactNode } from "react";
