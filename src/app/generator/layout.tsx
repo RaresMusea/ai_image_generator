@@ -34,7 +34,7 @@ export default function GeneratorLayout({ children }: GeneratorLayoutProps) {
                     <div className="flex items-center gap-2 justify-between">
                         <div>
                             <Sparkles className="h-4 w-4 text-primary" />
-                            <p className="text-xs text-muted-foreground">© 2025 AI Image Generator. All rights reserved.</p>
+                            <p className="text-xs text-muted-foreground">© 2025 AImagen. All rights reserved.</p>
                         </div>
                     </div>
                 </div>
