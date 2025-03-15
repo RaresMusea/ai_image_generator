@@ -10,6 +10,7 @@ import { Button } from "../ui/button";
 import { toast } from "sonner"
 import { ImageIcon, Loader2 } from "lucide-react";
 import { GeneratedImage } from "./GeneratorComponent";
+import { getImageResolution } from "@/lib/ImageUtils";
 
 type ImageDescriptorProps = {
     prompt: string | undefined;
@@ -32,6 +33,8 @@ export const ImageDescriptor = ({ prompt, size, generatedImage, generatedImages,
 
         setIsGenerating(true);
         setGeneratedImage(undefined);
+
+        console.log(getImageResolution(size!));
 
         try {
             // In a real application, this would call your API endpoint that uses the AI SDK
@@ -82,7 +85,7 @@ export const ImageDescriptor = ({ prompt, size, generatedImage, generatedImages,
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="size">Image Size</Label>
+                    <Label htmlFor="size">Image Size (WxH)</Label>
                     <Select value={size} onValueChange={setSize}>
                         <SelectTrigger id="size">
                             <SelectValue placeholder="Select size" />
