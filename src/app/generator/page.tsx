@@ -1,20 +1,6 @@
-"use client"
+import { GeneratorComponent } from "@/components/generator/GeneratorComponent"
 
-import type React from "react"
-
-import { useState, useRef } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Slider } from "@/components/ui/slider"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Loader2, ImageIcon, Download, Trash2, Copy, Upload, RefreshCw, Sparkles, ArrowLeft } from "lucide-react"
-import { toast } from "sonner"
-
-type GeneratedImageType = {
+export type GeneratedImage = {
   id: string
   url: string
   prompt: string
@@ -23,472 +9,356 @@ type GeneratedImageType = {
 }
 
 export default function ImageGeneratorPage() {
-  const [prompt, setPrompt] = useState("")
-  const [size, setSize] = useState("1024x1024")
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null)
-  const [seed, setSeed] = useState(0)
-  const [generatedImages, setGeneratedImages] = useState<GeneratedImageType[]>([])
-  const [activeTab, setActiveTab] = useState("create")
+  // const [prompt, setPrompt] = useState<string | undefined>("");
+  // const [size, setSize] = useState<string | undefined>("1024x1024");
+  // const [generatedImage, setGeneratedImage] = useState<string | undefined>(undefined);
+  // const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([])
+  // const [activeTab, setActiveTab] = useState("create")
 
-  // New state for image upload and analysis
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null)
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  // // New state for image upload and analysis
+  // const [uploadedImage, setUploadedImage] = useState<string | null>(null)
+  // const [isAnalyzing, setIsAnalyzing] = useState(false)
+  // const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleGenerate = async () => {
-    if (!prompt.trim()) return
+  // const handleGenerate = async () => {
+    
+  // }
 
-    setIsGenerating(true)
-    setGeneratedImage(null)
+  // const handleDownload = (imageUrl: string) => {
+  //   if (!imageUrl) return
 
-    try {
-      // In a real application, this would call your API endpoint that uses the AI SDK
-      // For demo purposes, we're simulating the API call with a timeout
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+  //   // In a real application, this would download the actual generated image
+  //   const link = document.createElement("a")
+  //   link.href = imageUrl
+  //   link.download = `generated-image-${Date.now()}.png`
+  //   document.body.appendChild(link)
+  //   link.click()
+  //   document.body.removeChild(link)
 
-      // Simulate a generated image with a placeholder
-      const imageUrl = `/placeholder.svg?height=512&width=512`
-      setGeneratedImage(imageUrl)
+  //   toast.success("Image downloaded")
+  // }
 
-      // Add to history
-      const newImage: GeneratedImageType = {
-        id: Date.now().toString(),
-        url: imageUrl,
-        prompt,
-        timestamp: new Date(),
-        size,
-      }
+  // const handleDelete = (id: string) => {
+  //   setGeneratedImages((prev) => prev.filter((img) => img.id !== id))
+  //   toast("Image deleted", {
+  //     description: "The image has been removed from your gallery",
+  //   })
+  // }
 
-      setGeneratedImages((prev) => [newImage, ...prev])
+  // const handleCopyPrompt = (promptText: string) => {
+  //   setPrompt(promptText)
+  //   setActiveTab("create")
+  //   toast("Prompt copied", {
+  //     description: "The prompt has been added to the generator",
+  //   })
+  // }
 
-      toast.success("Image generated successfully")
-    } catch (error) {
-      console.error("Failed to generate image:", error)
-      toast.error("Failed to generate image. Please try again.")
-    } finally {
-      setIsGenerating(false)
-    }
-  }
+  // const formatDate = (date: Date) => {
+  //   return new Intl.DateTimeFormat("en-US", {
+  //     month: "short",
+  //     day: "numeric",
+  //     hour: "2-digit",
+  //     minute: "2-digit",
+  //   }).format(date)
+  // }
 
-  const handleDownload = (imageUrl: string) => {
-    if (!imageUrl) return
+  // // New functions for image upload and analysis
+  // const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0]
+  //   if (!file) return
 
-    // In a real application, this would download the actual generated image
-    const link = document.createElement("a")
-    link.href = imageUrl
-    link.download = `generated-image-${Date.now()}.png`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+  //   // Check file size (limit to 5MB)
+  //   if (file.size > 5 * 1024 * 1024) {
+  //     toast.error("File too large", {
+  //       description: "Please upload an image smaller than 5MB",
+  //     })
+  //     return
+  //   }
 
-    toast.success("Image downloaded")
-  }
+  //   // Check file type
+  //   if (!file.type.startsWith("image/")) {
+  //     toast.error("Invalid file type", {
+  //       description: "Please upload an image file",
+  //     })
+  //     return
+  //   }
 
-  const handleDelete = (id: string) => {
-    setGeneratedImages((prev) => prev.filter((img) => img.id !== id))
-    toast("Image deleted", {
-      description: "The image has been removed from your gallery",
-    })
-  }
+  //   const reader = new FileReader()
+  //   reader.onload = (event) => {
+  //     setUploadedImage(event.target?.result as string)
+  //     toast("Image uploaded", {
+  //       description: "Your image is ready to be analyzed",
+  //     })
+  //   }
+  //   reader.readAsDataURL(file)
+  // }
 
-  const handleCopyPrompt = (promptText: string) => {
-    setPrompt(promptText)
-    setActiveTab("create")
-    toast("Prompt copied", {
-      description: "The prompt has been added to the generator",
-    })
-  }
+  // const handleAnalyzeImage = async () => {
+  //   if (!uploadedImage) return
 
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(date)
-  }
+  //   setIsAnalyzing(true)
 
-  // New functions for image upload and analysis
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+  //   try {
+  //     // Get the file from the input
+  //     const file = fileInputRef.current?.files?.[0]
+  //     if (!file) return
 
-    // Check file size (limit to 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File too large", {
-        description: "Please upload an image smaller than 5MB",
-      })
-      return
-    }
+  //     // Create form data
+  //     const formData = new FormData()
+  //     formData.append("image", file)
 
-    // Check file type
-    if (!file.type.startsWith("image/")) {
-      toast.error("Invalid file type", {
-        description: "Please upload an image file",
-      })
-      return
-    }
+  //     // In a real application, this would call your API endpoint
+  //     // For demo purposes, we'll simulate the API call
+  //     const simulateApiCall = async () => {
+  //       await new Promise((resolve) => setTimeout(resolve, 2000))
+  //       return {
+  //         description:
+  //           "A stunning digital artwork featuring a futuristic cityscape at sunset with flying cars and neon lights. The composition showcases towering skyscrapers with glowing windows against a gradient sky of orange, pink, and purple hues. Holographic advertisements float between buildings, while sleek vehicles with light trails navigate through the air. The scene has a cyberpunk aesthetic with rich contrast between shadows and vibrant colors, creating a moody yet energetic atmosphere that evokes a sense of wonder about the future.",
+  //       }
+  //     }
 
-    const reader = new FileReader()
-    reader.onload = (event) => {
-      setUploadedImage(event.target?.result as string)
-      toast("Image uploaded", {
-        description: "Your image is ready to be analyzed",
-      })
-    }
-    reader.readAsDataURL(file)
-  }
+  //     // In production, use this instead:
+  //     // const response = await fetch('/api/analyze-image', {
+  //     //   method: 'POST',
+  //     //   body: formData,
+  //     // })
+  //     // const data = await response.json()
 
-  const handleAnalyzeImage = async () => {
-    if (!uploadedImage) return
+  //     const data = await simulateApiCall()
 
-    setIsAnalyzing(true)
+  //     if (data.description) {
+  //       setPrompt(data.description)
+  //       setActiveTab("create")
+  //       toast.success("Image analyzed", {
+  //         description: "The description has been added to your prompt",
+  //       })
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to analyze image:", error)
+  //     toast.error("Failed to analyze image", {
+  //       description: "Please try again with a different image",
+  //     })
+  //   } finally {
+  //     setIsAnalyzing(false)
+  //   }
+  // }
 
-    try {
-      // Get the file from the input
-      const file = fileInputRef.current?.files?.[0]
-      if (!file) return
+  // const handleResetUpload = () => {
+  //   setUploadedImage(null)
+  //   if (fileInputRef.current) {
+  //     fileInputRef.current.value = ""
+  //   }
+  //   toast("Upload reset", {
+  //     description: "You can now upload a different image",
+  //   })
+  // }
 
-      // Create form data
-      const formData = new FormData()
-      formData.append("image", file)
+  // return (
+  //     <main className="container mx-auto py-10 px-4 md:px-6 flex-1">
+  //       <h1 className="text-3xl font-bold text-center mb-8">Create Your Image</h1>
+  //       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+  //         <TabsList className="grid w-full grid-cols-3 mb-8">
+  //           <TabsTrigger value="create">Create Image</TabsTrigger>
+  //           <TabsTrigger value="upload">Upload & Analyze</TabsTrigger>
+  //           <TabsTrigger value="gallery">My Gallery ({generatedImages.length})</TabsTrigger>
+  //         </TabsList>
 
-      // In a real application, this would call your API endpoint
-      // For demo purposes, we'll simulate the API call
-      const simulateApiCall = async () => {
-        await new Promise((resolve) => setTimeout(resolve, 2000))
-        return {
-          description:
-            "A stunning digital artwork featuring a futuristic cityscape at sunset with flying cars and neon lights. The composition showcases towering skyscrapers with glowing windows against a gradient sky of orange, pink, and purple hues. Holographic advertisements float between buildings, while sleek vehicles with light trails navigate through the air. The scene has a cyberpunk aesthetic with rich contrast between shadows and vibrant colors, creating a moody yet energetic atmosphere that evokes a sense of wonder about the future.",
-        }
-      }
+  //         <TabsContent value="create" className="mt-0">
+  //           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+  //             <ImageDescriptor prompt={prompt} 
+  //                              setPrompt={setPrompt}
+  //                              size={size} setSize={setSize}
+  //                              generatedImage={generatedImage}
+  //                              setGeneratedImage={setGeneratedImage}
+  //                             generatedImages={generatedImages}
+  //                             setGeneratedImages={setIsGenerating} />
+  //             <Card className="h-fit">
+  //               <CardHeader className="pb-2">
+  //                 <CardTitle>Generated Image</CardTitle>
+  //                 <CardDescription>Your AI-generated image will appear here</CardDescription>
+  //               </CardHeader>
+  //               <CardContent className="flex justify-center items-center pt-2">
+  //                 <div className="relative w-full bg-muted rounded-lg overflow-hidden flex items-center justify-center lg:h-[320px] h-auto aspect-square lg:aspect-auto">
+  //                   {isGenerating ? (
+  //                     <div className="flex flex-col items-center justify-center space-y-2">
+  //                       <Loader2 className="h-10 w-10 animate-spin text-primary" />
+  //                       <p className="text-sm text-muted-foreground">Generating your image...</p>
+  //                     </div>
+  //                   ) : generatedImage ? (
+  //                     <img
+  //                       src={generatedImage || "/placeholder.svg"}
+  //                       alt="Generated image"
+  //                       className="w-full h-full object-contain"
+  //                     />
+  //                   ) : (
+  //                     <div className="flex flex-col items-center justify-center space-y-2 py-8">
+  //                       <ImageIcon className="h-10 w-10 text-muted-foreground" />
+  //                       <p className="text-sm text-muted-foreground">Enter a prompt and click generate</p>
+  //                     </div>
+  //                   )}
+  //                 </div>
+  //               </CardContent>
+  //               <CardFooter className="pt-2">
+  //                 <Button
+  //                   variant="outline"
+  //                   onClick={() => generatedImage && handleDownload(generatedImage)}
+  //                   disabled={!generatedImage}
+  //                   className="w-full"
+  //                 >
+  //                   <Download className="mr-2 h-4 w-4" />
+  //                   Download Image
+  //                 </Button>
+  //               </CardFooter>
+  //             </Card>
+  //           </div>
+  //         </TabsContent>
 
-      // In production, use this instead:
-      // const response = await fetch('/api/analyze-image', {
-      //   method: 'POST',
-      //   body: formData,
-      // })
-      // const data = await response.json()
+  //         {/* Upload & Analyze Tab */}
+  //         <TabsContent value="upload" className="mt-0">
+  //           <Card>
+  //             <CardHeader>
+  //               <CardTitle>Upload & Analyze Image</CardTitle>
+  //               <CardDescription>
+  //                 Upload an image to analyze and generate a description for use as a prompt
+  //               </CardDescription>
+  //             </CardHeader>
+  //             <CardContent>
+  //               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+  //                 <div className="space-y-4">
+  //                   <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+  //                     <input
+  //                       type="file"
+  //                       id="image-upload"
+  //                       className="hidden"
+  //                       accept="image/*"
+  //                       onChange={handleImageUpload}
+  //                       ref={fileInputRef}
+  //                     />
+  //                     <Label
+  //                       htmlFor="image-upload"
+  //                       className="flex flex-col items-center justify-center cursor-pointer"
+  //                     >
+  //                       <Upload className="h-10 w-10 text-muted-foreground mb-2" />
+  //                       <span className="text-sm font-medium">Click to upload an image</span>
+  //                       <span className="text-xs text-muted-foreground mt-1">JPG, PNG, GIF up to 5MB</span>
+  //                     </Label>
+  //                   </div>
 
-      const data = await simulateApiCall()
+  //                   <div className="flex flex-col space-y-2">
+  //                     <Button onClick={handleAnalyzeImage} disabled={!uploadedImage || isAnalyzing} className="w-full">
+  //                       {isAnalyzing ? (
+  //                         <>
+  //                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+  //                           Analyzing...
+  //                         </>
+  //                       ) : (
+  //                         <>
+  //                           <RefreshCw className="mr-2 h-4 w-4" />
+  //                           Analyze Image
+  //                         </>
+  //                       )}
+  //                     </Button>
 
-      if (data.description) {
-        setPrompt(data.description)
-        setActiveTab("create")
-        toast.success("Image analyzed", {
-          description: "The description has been added to your prompt",
-        })
-      }
-    } catch (error) {
-      console.error("Failed to analyze image:", error)
-      toast.error("Failed to analyze image", {
-        description: "Please try again with a different image",
-      })
-    } finally {
-      setIsAnalyzing(false)
-    }
-  }
+  //                     <Button
+  //                       variant="outline"
+  //                       onClick={handleResetUpload}
+  //                       disabled={!uploadedImage}
+  //                       className="w-full"
+  //                     >
+  //                       Reset
+  //                     </Button>
+  //                   </div>
 
-  const handleResetUpload = () => {
-    setUploadedImage(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
-    }
-    toast("Upload reset", {
-      description: "You can now upload a different image",
-    })
-  }
+  //                   <div className="text-sm text-muted-foreground">
+  //                     <p>
+  //                       Upload an image to analyze it with AI. The system will generate a detailed description that you
+  //                       can use as a prompt for creating similar or derivative images.
+  //                     </p>
+  //                   </div>
+  //                 </div>
 
+  //                 <div className="bg-muted rounded-lg overflow-hidden flex items-center justify-center lg:h-[320px] h-auto aspect-square lg:aspect-auto">
+  //                   {uploadedImage ? (
+  //                     <img
+  //                       src={uploadedImage || "/placeholder.svg"}
+  //                       alt="Uploaded image"
+  //                       className="w-full h-full object-contain"
+  //                     />
+  //                   ) : (
+  //                     <div className="flex flex-col items-center justify-center space-y-2 p-8 text-center">
+  //                       <ImageIcon className="h-10 w-10 text-muted-foreground" />
+  //                       <p className="text-sm text-muted-foreground">Upload an image to see it here</p>
+  //                     </div>
+  //                   )}
+  //                 </div>
+  //               </div>
+  //             </CardContent>
+  //           </Card>
+  //         </TabsContent>
+
+  //         <TabsContent value="gallery" className="mt-0">
+  //           <Card>
+  //             <CardHeader>
+  //               <CardTitle>Generated Images Gallery</CardTitle>
+  //               <CardDescription>View and manage your previously generated images</CardDescription>
+  //             </CardHeader>
+  //             <CardContent>
+  //               {generatedImages.length === 0 ? (
+  //                 <div className="text-center py-12">
+  //                   <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
+  //                   <h3 className="mt-4 text-lg font-medium">No images yet</h3>
+  //                   <p className="mt-2 text-sm text-muted-foreground">Generate your first image to see it here</p>
+  //                   <Button variant="outline" className="mt-4" onClick={() => setActiveTab("create")}>
+  //                     Create an image
+  //                   </Button>
+  //                 </div>
+  //               ) : (
+  //                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  //                   {generatedImages.map((image) => (
+  //                     <div key={image.id} className="border rounded-lg overflow-hidden bg-card">
+  //                       <div className="aspect-square relative">
+  //                         <img
+  //                           src={image.url || "/placeholder.svg"}
+  //                           alt={image.prompt}
+  //                           className="w-full h-full object-cover"
+  //                         />
+  //                       </div>
+  //                       <div className="p-3">
+  //                         <p className="text-xs text-muted-foreground mb-1">
+  //                           {formatDate(image.timestamp)} • {image.size}
+  //                         </p>
+  //                         <p className="text-sm line-clamp-2 mb-3">{image.prompt}</p>
+  //                         <div className="flex space-x-2">
+  //                           <Button
+  //                             variant="outline"
+  //                             size="sm"
+  //                             className="flex-1"
+  //                             onClick={() => handleDownload(image.url)}
+  //                           >
+  //                             <Download className="h-3 w-3 mr-1" />
+  //                             Download
+  //                           </Button>
+  //                           <Button variant="outline" size="sm" onClick={() => handleCopyPrompt(image.prompt)}>
+  //                             <Copy className="h-3 w-3" />
+  //                             <span className="sr-only">Copy prompt</span>
+  //                           </Button>
+  //                           <Button variant="outline" size="sm" onClick={() => handleDelete(image.id)}>
+  //                             <Trash2 className="h-3 w-3" />
+  //                             <span className="sr-only">Delete</span>
+  //                           </Button>
+  //                         </div>
+  //                       </div>
+  //                     </div>
+  //                   ))}
+  //                 </div>
+  //               )}
+  //             </CardContent>
+  //           </Card>
+  //         </TabsContent>
+  //       </Tabs>
+  //     </main>
+  // )
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Header */}
-      <header className="border-b bg-background">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-          <div className="flex items-center gap-2">
-            <Link href="/" className="flex items-center gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              <span className="text-sm font-medium">Back to Home</span>
-            </Link>
-          </div>
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            <span className="text-lg font-semibold">AI Image Generator</span>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto py-10 px-4 md:px-6 flex-1">
-        <h1 className="text-3xl font-bold text-center mb-8">Create Your Image</h1>
-
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
-            <TabsTrigger value="create">Create Image</TabsTrigger>
-            <TabsTrigger value="upload">Upload & Analyze</TabsTrigger>
-            <TabsTrigger value="gallery">My Gallery ({generatedImages.length})</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="create" className="mt-0">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <Card className="h-fit">
-                <CardHeader className="pb-2">
-                  <CardTitle>Image Prompt</CardTitle>
-                  <CardDescription>Describe the image you want to generate in detail</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4 pt-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="prompt">Prompt</Label>
-                    <Textarea
-                      id="prompt"
-                      placeholder="A futuristic cityscape at sunset with flying cars and neon lights..."
-                      value={prompt}
-                      onChange={(e) => setPrompt(e.target.value)}
-                      className="min-h-[120px] max-h-[200px]"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="size">Image Size</Label>
-                    <Select value={size} onValueChange={setSize}>
-                      <SelectTrigger id="size">
-                        <SelectValue placeholder="Select size" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1024x1024">1024x1024 (Square)</SelectItem>
-                        <SelectItem value="1024x1792">1024x1792 (Portrait)</SelectItem>
-                        <SelectItem value="1792x1024">1792x1024 (Landscape)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <Label htmlFor="seed">Random Seed</Label>
-                      <span className="text-sm text-muted-foreground">{seed}</span>
-                    </div>
-                    <Slider
-                      id="seed"
-                      min={0}
-                      max={1000000}
-                      step={1}
-                      value={[seed]}
-                      onValueChange={(values) => setSeed(values[0])}
-                    />
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button onClick={handleGenerate} disabled={isGenerating || !prompt.trim()} className="w-full">
-                    {isGenerating ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <ImageIcon className="mr-2 h-4 w-4" />
-                        Generate Image
-                      </>
-                    )}
-                  </Button>
-                </CardFooter>
-              </Card>
-
-              <Card className="h-fit">
-                <CardHeader className="pb-2">
-                  <CardTitle>Generated Image</CardTitle>
-                  <CardDescription>Your AI-generated image will appear here</CardDescription>
-                </CardHeader>
-                <CardContent className="flex justify-center items-center pt-2">
-                  <div className="relative w-full bg-muted rounded-lg overflow-hidden flex items-center justify-center lg:h-[320px] h-auto aspect-square lg:aspect-auto">
-                    {isGenerating ? (
-                      <div className="flex flex-col items-center justify-center space-y-2">
-                        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-                        <p className="text-sm text-muted-foreground">Generating your image...</p>
-                      </div>
-                    ) : generatedImage ? (
-                      <img
-                        src={generatedImage || "/placeholder.svg"}
-                        alt="Generated image"
-                        className="w-full h-full object-contain"
-                      />
-                    ) : (
-                      <div className="flex flex-col items-center justify-center space-y-2 py-8">
-                        <ImageIcon className="h-10 w-10 text-muted-foreground" />
-                        <p className="text-sm text-muted-foreground">Enter a prompt and click generate</p>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-                <CardFooter className="pt-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => generatedImage && handleDownload(generatedImage)}
-                    disabled={!generatedImage}
-                    className="w-full"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Download Image
-                  </Button>
-                </CardFooter>
-              </Card>
-            </div>
-          </TabsContent>
-
-          {/* Upload & Analyze Tab */}
-          <TabsContent value="upload" className="mt-0">
-            <Card>
-              <CardHeader>
-                <CardTitle>Upload & Analyze Image</CardTitle>
-                <CardDescription>
-                  Upload an image to analyze and generate a description for use as a prompt
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <div className="space-y-4">
-                    <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
-                      <input
-                        type="file"
-                        id="image-upload"
-                        className="hidden"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        ref={fileInputRef}
-                      />
-                      <Label
-                        htmlFor="image-upload"
-                        className="flex flex-col items-center justify-center cursor-pointer"
-                      >
-                        <Upload className="h-10 w-10 text-muted-foreground mb-2" />
-                        <span className="text-sm font-medium">Click to upload an image</span>
-                        <span className="text-xs text-muted-foreground mt-1">JPG, PNG, GIF up to 5MB</span>
-                      </Label>
-                    </div>
-
-                    <div className="flex flex-col space-y-2">
-                      <Button onClick={handleAnalyzeImage} disabled={!uploadedImage || isAnalyzing} className="w-full">
-                        {isAnalyzing ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Analyzing...
-                          </>
-                        ) : (
-                          <>
-                            <RefreshCw className="mr-2 h-4 w-4" />
-                            Analyze Image
-                          </>
-                        )}
-                      </Button>
-
-                      <Button
-                        variant="outline"
-                        onClick={handleResetUpload}
-                        disabled={!uploadedImage}
-                        className="w-full"
-                      >
-                        Reset
-                      </Button>
-                    </div>
-
-                    <div className="text-sm text-muted-foreground">
-                      <p>
-                        Upload an image to analyze it with AI. The system will generate a detailed description that you
-                        can use as a prompt for creating similar or derivative images.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="bg-muted rounded-lg overflow-hidden flex items-center justify-center lg:h-[320px] h-auto aspect-square lg:aspect-auto">
-                    {uploadedImage ? (
-                      <img
-                        src={uploadedImage || "/placeholder.svg"}
-                        alt="Uploaded image"
-                        className="w-full h-full object-contain"
-                      />
-                    ) : (
-                      <div className="flex flex-col items-center justify-center space-y-2 p-8 text-center">
-                        <ImageIcon className="h-10 w-10 text-muted-foreground" />
-                        <p className="text-sm text-muted-foreground">Upload an image to see it here</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="gallery" className="mt-0">
-            <Card>
-              <CardHeader>
-                <CardTitle>Generated Images Gallery</CardTitle>
-                <CardDescription>View and manage your previously generated images</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {generatedImages.length === 0 ? (
-                  <div className="text-center py-12">
-                    <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
-                    <h3 className="mt-4 text-lg font-medium">No images yet</h3>
-                    <p className="mt-2 text-sm text-muted-foreground">Generate your first image to see it here</p>
-                    <Button variant="outline" className="mt-4" onClick={() => setActiveTab("create")}>
-                      Create an image
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {generatedImages.map((image) => (
-                      <div key={image.id} className="border rounded-lg overflow-hidden bg-card">
-                        <div className="aspect-square relative">
-                          <img
-                            src={image.url || "/placeholder.svg"}
-                            alt={image.prompt}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="p-3">
-                          <p className="text-xs text-muted-foreground mb-1">
-                            {formatDate(image.timestamp)} • {image.size}
-                          </p>
-                          <p className="text-sm line-clamp-2 mb-3">{image.prompt}</p>
-                          <div className="flex space-x-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="flex-1"
-                              onClick={() => handleDownload(image.url)}
-                            >
-                              <Download className="h-3 w-3 mr-1" />
-                              Download
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => handleCopyPrompt(image.prompt)}>
-                              <Copy className="h-3 w-3" />
-                              <span className="sr-only">Copy prompt</span>
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => handleDelete(image.id)}>
-                              <Trash2 className="h-3 w-3" />
-                              <span className="sr-only">Delete</span>
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </main>
-
-      <footer className="border-t bg-background flex items-center justify-between">
-        <div className="container flex flex-col gap-2 py-4 md:flex-row md:items-center md:justify-between px-4 md:px-6">
-          <div className="flex items-center gap-2 justify-between">
-            <div>
-            <Sparkles className="h-4 w-4 text-primary" />
-            <p className="text-xs text-muted-foreground">© 2025 AI Image Generator. All rights reserved.</p>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </div>
+    <GeneratorComponent />
   )
 }

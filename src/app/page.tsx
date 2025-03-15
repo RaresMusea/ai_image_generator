@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Sparkles, Upload, ImageIcon, Palette, Zap, Github } from "lucide-react"
+import { ArrowRight, Sparkles, Upload, ImageIcon, Palette, Zap } from "lucide-react"
 import Image from "next/image"
 import first from "../../public/1.jpg"
 import second from "../../public/2.png"
@@ -11,7 +11,6 @@ import { ModeToggle } from "@/components/themes/ModeToggle"
 export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Navigation */}
       <header className="border-b bg-background">
         <div className="container flex h-15 items-center mx-auto justify-between px-4 md:px-6">
           <div className="flex items-center gap-2">
@@ -30,7 +29,6 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* Hero Section */}
       <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-background to-muted">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid gap-6 lg:grid-cols-[1fr_600px] lg:gap-12 xl:grid-cols-[1fr_800px]">
@@ -101,7 +99,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="w-full py-12 md:py-24 lg:py-32 bg-background">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -151,7 +148,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -172,7 +168,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t bg-background">
         <div className="container mx-auto flex flex-col gap-4 py-10 md:flex-row md:items-center md:justify-between md:py-12 px-4 md:px-6">
           <div className="flex items-center gap-2">
