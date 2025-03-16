@@ -19,7 +19,7 @@ export type GeneratedImage = {
 
 export const GeneratorComponent = () => {
     const [prompt, setPrompt] = useState<string | undefined>('');
-    const [size, setSize] = useState<string | undefined>("1024x1024");
+    const [size, setSize] = useState<string | undefined>("512x512");
     const [generatedImage, setGeneratedImage] = useState<string | undefined>(undefined);
     const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([])
     const [activeTab, setActiveTab] = useState("generate")

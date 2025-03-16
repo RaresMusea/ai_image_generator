@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import axios from "axios";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card"
 import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
@@ -10,7 +11,6 @@ import { Button } from "../ui/button";
 import { toast } from "sonner"
 import { ImageIcon, Loader2 } from "lucide-react";
 import { GeneratedImage } from "./GeneratorComponent";
-import { getImageResolution } from "@/lib/ImageUtils";
 
 type ImageDescriptorProps = {
     prompt: string | undefined;
@@ -34,34 +34,23 @@ export const ImageDescriptor = ({ prompt, size, generatedImage, generatedImages,
         setIsGenerating(true);
         setGeneratedImage(undefined);
 
-        console.log(getImageResolution(size!));
-
         try {
-            // In a real application, this would call your API endpoint that uses the AI SDK
-            // For demo purposes, we're simulating the API call with a timeout
-            //TO BE CHANGED
-            await new Promise((resolve) => setTimeout(resolve, 2000))
-
-            //TO BE REPLACED WITH ALGORITHM
-            const imageUrl = `/placeholder.svg?height=512&width=512`
-            setGeneratedImage(imageUrl)
-
+            const { data } = await axios.post("/api/proxy/generate", { prompt, size, seed });
             const newImage: GeneratedImage = {
                 id: Date.now().toString(),
-                url: imageUrl,
+                url: data.image,
                 prompt,
                 timestamp: new Date(),
                 size: size || "1024x1024",
-            }
-
-            setGeneratedImages([newImage, ...generatedImages])
-
-            toast.success("Image generated successfully")
+            };
+            setGeneratedImage(newImage.url);
+            setGeneratedImages([newImage, ...generatedImages]);
+            toast.success("Image generated successfully!")
         } catch (error) {
-            console.error("Failed to generate image:", error)
-            toast.error("Failed to generate image. Please try again.")
+            console.error("Failed to generate image:", error);
+            toast.error("Failed to generate image. Please try again later.");
         } finally {
-            setIsGenerating(false)
+            setIsGenerating(false);
         }
     }
 
@@ -91,6 +80,9 @@ export const ImageDescriptor = ({ prompt, size, generatedImage, generatedImages,
                             <SelectValue placeholder="Select size" />
                         </SelectTrigger>
                         <SelectContent>
+                            <SelectItem value="512x512">512x512 (Square)</SelectItem>
+                            <SelectItem value="512x768">512x768 (Portrait)</SelectItem>
+                            <SelectItem value="768x768">768x768 (Square)</SelectItem>
                             <SelectItem value="1024x1024">1024x1024 (Square)</SelectItem>
                             <SelectItem value="1024x1792">1024x1792 (Portrait)</SelectItem>
                             <SelectItem value="1792x1024">1792x1024 (Landscape)</SelectItem>

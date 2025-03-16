@@ -1,6 +1,6 @@
 import { toast } from "sonner";
 
-interface ImageResolution {
+export interface ImageResolution {
     width: number;
     height: number;
 };
