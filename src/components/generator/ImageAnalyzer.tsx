@@ -5,8 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui
 import { useRef, useState } from "react";
 import { ImageValidationResult, isImageValid } from "@/lib/ImageValidator";
 import { Label } from "../ui/label";
-import { CircleX, ImageIcon, Loader2, RefreshCw, SkipBackIcon, Upload } from "lucide-react";
+import { ImageIcon, Loader2, RefreshCw, Upload } from "lucide-react";
 import { Button } from "../ui/button";
+import axios, { AxiosError } from "axios";
+import { getImageExtension } from "@/lib/ImageUtils";
 
 const MAXIMUM_FILE_UPLOAD = 10 * 1024 * 1024;
 
@@ -14,15 +16,18 @@ type ImageAnalyzerProps = {
     prompt: string | undefined;
     setPrompt: (newPrompt: string | undefined) => void;
     setActiveTab: (currentActiveTab: string) => void;
+    setGeneratedImage: (currentGeneratedImage: string | undefined) => void;
 };
 
-export const ImageAnalyzer = ({prompt, setPrompt, setActiveTab}: ImageAnalyzerProps) => {
+export const ImageAnalyzer = ({ prompt, setPrompt, setActiveTab, setGeneratedImage }: ImageAnalyzerProps) => {
     const [uploadedImage, setUploadedImage] = useState<string | undefined>('');
-    const fileInputRef = useRef<HTMLInputElement>(null); 
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+    const [imageDetails, setImageDetails] = useState<File | undefined>();
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
+        const file: File | undefined = e.target.files?.[0];
+        setImageDetails(file);
 
         if (!file) return;
 
@@ -45,65 +50,47 @@ export const ImageAnalyzer = ({prompt, setPrompt, setActiveTab}: ImageAnalyzerPr
         const reader = new FileReader();
 
         reader.onload = (event) => {
-            setUploadedImage(event.target?.result as string)
-            toast("Image uploaded", {
-                description: "Your image is ready to be analyzed",
+            const base64Result: string = event.target?.result as string;
+            const cleanBase64 = base64Result;
+
+            setUploadedImage(cleanBase64);
+            toast.success("Image uploaded successfully!", {
+                description: "Your image is ready to be analyzed.",
             })
         }
         reader.readAsDataURL(file);
     }
 
     const analyzeImage = async () => {
-        if (!uploadedImage) return;
-
         setIsAnalyzing(true);
 
+        if (!imageDetails || !uploadedImage) {
+            toast.error('Error', { description: 'Invalid image!' });
+        }
+
         try {
-            // Get the file from the input
-            const file = fileInputRef.current?.files?.[0];
-            if (!file) return;
+            const response = await axios.post("/api/proxy/analyze", { image: uploadedImage, extension: getImageExtension(imageDetails!) });
 
-            // Create form data
-            const formData = new FormData()
-            formData.append("image", file)
-
-            // In a real application, this would call your API endpoint
-            // For demo purposes, we'll simulate the API call
-            const simulateApiCall = async () => {
-                await new Promise((resolve) => setTimeout(resolve, 2000))
-                return {
-                    description:
-                        "A stunning digital artwork featuring a futuristic cityscape at sunset with flying cars and neon lights. The composition showcases towering skyscrapers with glowing windows against a gradient sky of orange, pink, and purple hues. Holographic advertisements float between buildings, while sleek vehicles with light trails navigate through the air. The scene has a cyberpunk aesthetic with rich contrast between shadows and vibrant colors, creating a moody yet energetic atmosphere that evokes a sense of wonder about the future.",
-                }
+            if (response.status === 201) {
+                setGeneratedImage(undefined);
+                setPrompt(response.data.generatedPrompt);
+                setActiveTab('generate');
+                toast.success("Image analysis complete", { description: 'The description has been added to your prompt.' });
             }
+        }
+        catch (error) {
+            toast.error("Error", {
+                description: ((error as AxiosError).response?.data as string) || "An unknown error occurred."
+            });
 
-            // In production, use this instead:
-            // const response = await fetch('/api/analyze-image', {
-            //   method: 'POST',
-            //   body: formData,
-            // })
-            // const data = await response.json()
-
-            const data = await simulateApiCall()
-
-            if (data.description) {
-                setPrompt(data.description);
-                setActiveTab("generate");
-                toast.success("Image analyzed", {
-                    description: "The description has been added to your prompt",
-                })
-            }
-        } catch (error) {
-            toast.error("Failed to analyze image", {
-                description: "Please try again with a different image",
-            })
         } finally {
             setIsAnalyzing(false);
         }
     }
 
-        const handleResetUpload = () => {
+    const handleResetUpload = () => {
         setUploadedImage(undefined);
+        setImageDetails(undefined);
 
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
@@ -125,22 +112,33 @@ export const ImageAnalyzer = ({prompt, setPrompt, setActiveTab}: ImageAnalyzerPr
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div className="space-y-4">
                         <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
-                            <input
-                                type="file"
-                                id="image-upload"
-                                className="hidden"
-                                accept="image/*"
-                                onChange={handleImageUpload}
-                                ref={fileInputRef}
-                            />
-                            <Label
-                                htmlFor="image-upload"
-                                className="flex flex-col items-center justify-center cursor-pointer"
-                            >
-                                <Upload className="h-10 w-10 text-muted-foreground mb-2" />
-                                <span className="text-sm font-medium">Click to upload an image</span>
-                                <span className="text-xs text-muted-foreground mt-1">JPG, PNG, GIF up to 5MB</span>
-                            </Label>
+                            {!imageDetails ?
+                                <>
+                                    <input
+                                        type="file"
+                                        id="image-upload"
+                                        className="hidden"
+                                        accept="image/*"
+                                        onChange={handleImageUpload}
+                                        ref={fileInputRef}
+                                    />
+                                    <Label
+                                        htmlFor="image-upload"
+                                        className="flex flex-col items-center justify-center cursor-pointer"
+                                    >
+                                        <Upload className="h-10 w-10 text-muted-foreground mb-2" />
+                                        <span className="text-sm font-medium">Click to upload an image</span>
+                                        <span className="text-xs text-muted-foreground mt-1">JPG, PNG, GIF up to 5MB</span>
+                                    </Label>
+                                </>
+                                :
+                                <Label htmlFor="iamge-upload"
+                                    className="flex flex-col items-center justify-center cursor-pointer">
+                                    <ImageIcon className="h-10 w-10 text-muted-foreground mb-2" />
+                                    <span className="text-sm font-medium">Uploaded image: <b>{imageDetails?.name}</b></span>
+                                </Label>
+
+                            }
                         </div>
 
                         <div className="flex flex-col space-y-2">

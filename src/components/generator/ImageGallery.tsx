@@ -12,9 +12,10 @@ type ImageGalleryProps = {
     setActiveTab: (currentActiveTab: string) => void;
     handleImageDownload: (imageUrl: string) => void;
     setPrompt: (newPrompt: string | undefined) => void;
+    setGeneratedImage: (newImage: string | undefined) => void;
 };
 
-export const ImageGallery = ({ generatedImages, setGeneratedImages, setActiveTab, handleImageDownload, setPrompt }: ImageGalleryProps) => {
+export const ImageGallery = ({ generatedImages, setGeneratedImages, setActiveTab, handleImageDownload, setPrompt, setGeneratedImage }: ImageGalleryProps) => {
 
     const formatDate = (date: Date) => {
         return new Intl.DateTimeFormat("en-US", {
@@ -26,11 +27,13 @@ export const ImageGallery = ({ generatedImages, setGeneratedImages, setActiveTab
     };
 
     const handleCopyPrompt = (promptText: string) => {
-        setPrompt(promptText)
-        setActiveTab("create")
+        setActiveTab("generate");
+        setPrompt(promptText);
+        setGeneratedImage(undefined);
+
         toast("Prompt copied", {
             description: "The prompt has been added to the generator",
-        })
+        });
     };
 
     const handleDelete = (id: string) => {
