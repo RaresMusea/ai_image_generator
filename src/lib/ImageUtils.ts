@@ -20,3 +20,17 @@ export const getImageResolution = (size: string) => {
         height: parseInt(height)
     };
 }
+
+export const getImageExtension = (imageFile: File): string | undefined  => {
+    if (!imageFile) {
+        return undefined;
+    }
+
+    const parts = imageFile.name.split('.');
+    
+    if (parts.length > 1) {
+        return parts.pop()?.toLowerCase() || undefined;
+    }
+
+    return undefined;
+}

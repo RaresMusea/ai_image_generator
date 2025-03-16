@@ -22,7 +22,7 @@ export const GeneratorComponent = () => {
     const [size, setSize] = useState<string | undefined>("512x512");
     const [generatedImage, setGeneratedImage] = useState<string | undefined>(undefined);
     const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([])
-    const [activeTab, setActiveTab] = useState("generate")
+    const [activeTab, setActiveTab] = useState<string>("generate");
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
     const handleImageDownload = (imageUrl: string) => {
@@ -68,13 +68,15 @@ export const GeneratorComponent = () => {
                 <TabsContent value="upload" className="mt-0">
                     <ImageAnalyzer prompt={prompt}
                         setPrompt={setPrompt}
-                        setActiveTab={setActiveTab} />
+                        setActiveTab={setActiveTab}
+                        setGeneratedImage={setGeneratedImage} />
                 </TabsContent>
                 <TabsContent value="gallery" className="mt-0">
                     <ImageGallery generatedImages={generatedImages}
                         setGeneratedImages={setGeneratedImages}
                         setActiveTab={setActiveTab}
                         handleImageDownload={handleImageDownload}
+                        setGeneratedImage={setGeneratedImage}
                         setPrompt={setPrompt} />
                 </TabsContent>
             </Tabs>
