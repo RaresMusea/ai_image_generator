@@ -23,6 +23,7 @@ interface ImageGeneratorContextProps {
 
 export type GeneratedImage = {
     id: string
+    generationToken: string
     url: string
     prompt: string
     timestamp: Date
@@ -48,6 +49,7 @@ export const ImageGeneratorProvider: React.FC<{children: React.ReactNode}> = ({c
         }, [imageCount]);
 
         const handleImageDownload = (imageUrl: string) => {
+            console.warn("IMAGE URL", imageUrl);
             if (generatedImage) {
                 const link = document.createElement("a");
                 link.href = imageUrl;

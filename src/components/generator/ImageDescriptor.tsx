@@ -42,6 +42,7 @@ export const ImageDescriptor = () => {
             if (data.images.length === 1) {
                 const newImage: GeneratedImage = {
                     id: Date.now().toString(),
+                    generationToken: data.generationToken,
                     url: data.images[0],
                     prompt,
                     timestamp: new Date(),
@@ -57,6 +58,7 @@ export const ImageDescriptor = () => {
                 data.images.forEach((i: string, idx: number) => {
                     newImages.push({
                         id: (Date.now() + idx).toString(),
+                        generationToken: data.generationToken,
                         url: i,
                         prompt,
                         timestamp: new Date(),

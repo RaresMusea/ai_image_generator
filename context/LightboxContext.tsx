@@ -8,7 +8,8 @@ interface LightboxContextProps {
     setLightboxOpen: (newState: boolean) => void;
     setLightboxImages: (lightBoxImages: LightboxSourcesProps[]) => void;
     setLightboxIndex: (newLightboxIndex: number) => void;
-    openGeneratedImagesLightbox: (index:number, generatedImages: GeneratedImage[]) => void;
+    openGeneratedImagesLightbox: (index: number, generatedImages: GeneratedImage[]) => void;
+    openGalleryLightbox: (generatedImages: GeneratedImage[], batchId: string, index: number) => void;
 };
 
 type LightboxSourcesProps = {
@@ -24,18 +25,33 @@ export const LightboxProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const [lightboxImages, setLightboxImages] = useState<LightboxSourcesProps[]>([])
     const [lightboxIndex, setLightboxIndex] = useState<number>(0);
 
-    const openGeneratedImagesLightbox = (index:number = 0, generatedImages: GeneratedImage[]) => {
+    const openGeneratedImagesLightbox = (index: number = 0, generatedImages: GeneratedImage[]) => {
         console.log(generatedImages);
         if (generatedImages.length === 0) return;
 
         setLightboxImages(
-          generatedImages.map((img) => ({
-            id: img.id,
-            url: img.url,
-            prompt: img.prompt,
-          })),
+            generatedImages.map((img) => ({
+                id: img.id,
+                url: img.url,
+                prompt: img.prompt,
+            })),
         )
         setLightboxIndex(index)
+        setLightboxOpen(true);
+    }
+
+    const openGalleryLightbox = (generatedImages: GeneratedImage[], batchId: string, index: number = 0) => {
+        const batch = generatedImages.filter((img) => img.generationToken === batchId);
+
+        setLightboxImages(
+            batch.map((img) => ({
+                id: img.id,
+                url: img.url,
+                prompt: img.prompt,
+            })),
+        );
+
+        setLightboxIndex(index);
         setLightboxOpen(true);
     }
 
@@ -47,6 +63,7 @@ export const LightboxProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             setLightboxIndex,
             setLightboxImages,
             openGeneratedImagesLightbox,
+            openGalleryLightbox,
             setLightboxOpen
         }}>
             {children}
