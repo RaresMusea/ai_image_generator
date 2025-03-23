@@ -48,6 +48,7 @@ export const ImageDescriptor = () => {
                     size: size || "512x512",
                 };
                 setGeneratedImage(newImage.url);
+                setMultipleGenerated([newImage]);
                 setGeneratedImages([newImage, ...generatedImages]);
                 toast.success("Image generated successfully!")
             }
@@ -65,9 +66,8 @@ export const ImageDescriptor = () => {
 
                 setGeneratedImage(newImages[0].url);
                 setMultipleGenerated(newImages);
-                console.log(newImages);
                 setGeneratedImages([...newImages, ...generatedImages]);
-                toast.success("Images generated successfully!");
+                toast.success(`${imageCount} images were successfully generated!`);
             }
         } catch (error) {
             console.error("Failed to generate image:", error);

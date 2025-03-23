@@ -58,14 +58,14 @@ export const ImageGenerator = () => {
                         </div>
                     ) : generatedImage ? (
                         <>
-                            <Button variant="ghost" size="icon" className="absolute top-2 right-2 z-10 bg-background/50 hover:bg-background/80" onClick={() => openGeneratedImagesLightbox(0, generatedImages)}>
+                            <Button variant="ghost" size="icon" className="absolute top-2 right-2 z-10 bg-background/50 hover:bg-background/80" onClick={() => { imageCount === '1' ? openGeneratedImagesLightbox(0, multipleGenerated) : openGeneratedImagesLightbox(currentIndex, multipleGenerated) }}>
                                 <Maximize2 className="h4 w-4" />
                                 <span className="sr-only">View fullscreen</span>
                             </Button>
 
                             {
                                 Number.parseInt(imageCount) > 1 ? (
-                                    <Carousel className="w-full" opts={{ loop: false, skipSnaps: false, dragFree: false, duration:20, align: "start" }} setApi={setCarouselApi}>
+                                    <Carousel className="w-full" opts={{ loop: false, skipSnaps: false, dragFree: false, duration: 20, align: "start" }} setApi={setCarouselApi}>
                                         <CarouselContent>
                                             {
                                                 multipleGenerated.map((im, idx) => (

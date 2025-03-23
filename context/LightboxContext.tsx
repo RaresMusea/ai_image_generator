@@ -25,13 +25,11 @@ export const LightboxProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const [lightboxIndex, setLightboxIndex] = useState<number>(0);
 
     const openGeneratedImagesLightbox = (index:number = 0, generatedImages: GeneratedImage[]) => {
+        console.log(generatedImages);
         if (generatedImages.length === 0) return;
 
-        const latestTimestamp = generatedImages[0].id.split("-")[0]
-        const batch = generatedImages.filter((img) => img.id.startsWith(latestTimestamp))
-    
         setLightboxImages(
-          batch.map((img) => ({
+          generatedImages.map((img) => ({
             id: img.id,
             url: img.url,
             prompt: img.prompt,
