@@ -9,14 +9,14 @@ import { ImageGallery } from "./ImageGallery";
 import { useImageGenerator } from "../../../context/ImageGeneratrorContext";
 
 export const GeneratorComponent = () => {
-    const { activeTab, setActiveTab, generatedImages} = useImageGenerator();
+    const { activeTab, setActiveTab, generatedImages, imageCount} = useImageGenerator();
 
     return (
         <main className="container mx-auto py-10 px-4 md:px-6 flex-1">
             <h1 className="text-3xl font-bold text-center mb-8">Create Your Images</h1>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-3 mb-8">
-                    <TabsTrigger value="generate" className={activeTab === 'generate' ? "font-bold" : ''}>Generate Image</TabsTrigger>
+                    <TabsTrigger value="generate" className={activeTab === 'generate' ? "font-bold" : ''}>Generate {imageCount === '1' ? 'Image' : 'Images'}</TabsTrigger>
                     <TabsTrigger value="upload" className={activeTab === 'upload' ? "font-bold" : ''}>Upload & Analyze</TabsTrigger>
                     <TabsTrigger value="gallery" className={activeTab === 'gallery' ? "font-bold" : ''}>My Gallery ({generatedImages.length})</TabsTrigger>
                 </TabsList>
