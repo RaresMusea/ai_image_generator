@@ -65,7 +65,7 @@ export const ImageGallery = () => {
                                 </div>
                                 <div className="p-3">
                                     <p className="text-xs text-muted-foreground mb-1">
-                                        {formatDate(image.timestamp)} • {image.size}
+                                        {formatDate(image.timestamp as Date)} • {image.size}
                                     </p>
                                     <p className="text-sm line-clamp-2 mb-3">{image.prompt}</p>
                                     <div className="flex space-x-2">

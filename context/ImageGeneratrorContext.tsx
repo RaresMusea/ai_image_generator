@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface ImageGeneratorContextProps {
@@ -9,6 +9,7 @@ interface ImageGeneratorContextProps {
     activeTab: string;
     isGenerating: boolean;
     imageCount: string;
+    multipleGenerated: GeneratedImage[];
     setPrompt: (newPrompt: string | undefined) => void;
     setSize: (newSize: string | undefined) => void;
     setGeneratedImage: (newSize: string | undefined) => void;
@@ -16,6 +17,7 @@ interface ImageGeneratorContextProps {
     setIsGenerating: (newState: boolean) => void;
     setActiveTab: (newActiveTab: string) => void;
     setImageCount: (newImageCount: string) => void;
+    setMultipleGenerated: (newArray: GeneratedImage[]) => void;
     handleImageDownload: (url: string) => void;
 };
 
@@ -37,7 +39,13 @@ export const ImageGeneratorProvider: React.FC<{children: React.ReactNode}> = ({c
         const [activeTab, setActiveTab] = useState<string>("generate");
         const [isGenerating, setIsGenerating] = useState<boolean>(false);
         const [imageCount, setImageCount] = useState<string>("1");
+        const [multipleGenerated, setMultipleGenerated] = useState<GeneratedImage[]>([]);
 
+        useEffect(() => {
+            if (imageCount !== "1" && generatedImage) {
+                setGeneratedImage(undefined);
+            } 
+        }, [imageCount]);
 
         const handleImageDownload = (imageUrl: string) => {
             if (generatedImage) {
@@ -61,6 +69,7 @@ export const ImageGeneratorProvider: React.FC<{children: React.ReactNode}> = ({c
             activeTab,
             isGenerating,
             imageCount,
+            multipleGenerated,
             setPrompt,
             setSize,
             setGeneratedImage,
@@ -68,6 +77,7 @@ export const ImageGeneratorProvider: React.FC<{children: React.ReactNode}> = ({c
             setIsGenerating,
             setActiveTab,
             setImageCount,
+            setMultipleGenerated,
             handleImageDownload
         }}>
             {children}
