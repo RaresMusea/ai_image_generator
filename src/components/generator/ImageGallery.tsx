@@ -2,20 +2,12 @@
 
 import { Copy, Download, ImageIcon, Trash2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
-import { GeneratedImage } from "./GeneratorComponent";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
+import { GeneratedImage, useImageGenerator } from "../../../context/ImageGeneratrorContext";
 
-type ImageGalleryProps = {
-    generatedImages: GeneratedImage[];
-    setGeneratedImages: (generatedImages: GeneratedImage[] | ((prev: GeneratedImage[]) => GeneratedImage[])) => void;
-    setActiveTab: (currentActiveTab: string) => void;
-    handleImageDownload: (imageUrl: string) => void;
-    setPrompt: (newPrompt: string | undefined) => void;
-    setGeneratedImage: (newImage: string | undefined) => void;
-};
-
-export const ImageGallery = ({ generatedImages, setGeneratedImages, setActiveTab, handleImageDownload, setPrompt, setGeneratedImage }: ImageGalleryProps) => {
+export const ImageGallery = () => {
+    const {generatedImages, setActiveTab, setPrompt, setGeneratedImage, setGeneratedImages, handleImageDownload} = useImageGenerator();
 
     const formatDate = (date: Date) => {
         return new Intl.DateTimeFormat("en-US", {
@@ -37,7 +29,7 @@ export const ImageGallery = ({ generatedImages, setGeneratedImages, setActiveTab
     };
 
     const handleDelete = (id: string) => {
-        setGeneratedImages((prev: GeneratedImage[]) => prev.filter((img: GeneratedImage) => img.id !== id));
+        setGeneratedImages(generatedImages.filter((img: GeneratedImage) => img.id !== id));
 
         toast("Image deleted", {
             description: "The image has been removed from your gallery.",

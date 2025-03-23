@@ -10,23 +10,23 @@ import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import { toast } from "sonner"
 import { ImageIcon, Loader2 } from "lucide-react";
-import { GeneratedImage } from "./GeneratorComponent";
+import { GeneratedImage, useImageGenerator } from "../../../context/ImageGeneratrorContext";
 
-type ImageDescriptorProps = {
-    prompt: string | undefined;
-    setPrompt: (prompt: string | undefined) => void;
-    size: string | undefined;
-    setSize: (newSize: string | undefined) => void;
-    generatedImage: string | undefined;
-    setGeneratedImage: (newImage: string | undefined) => void;
-    generatedImages: GeneratedImage[];
-    setGeneratedImages: (newGeneratedImages: GeneratedImage[]) => void;
-    isGenerating: boolean;
-    setIsGenerating: (state: boolean) => void;
-}
-
-export const ImageDescriptor = ({ prompt, size, generatedImage, generatedImages, isGenerating, setIsGenerating, setPrompt, setSize, setGeneratedImage, setGeneratedImages }: ImageDescriptorProps) => {
+export const ImageDescriptor = () => {
     const [seed, setSeed] = useState<number>(0);
+    const {
+        prompt,
+        size,
+        imageCount,
+        isGenerating,
+        generatedImages,
+        setPrompt,
+        setSize,
+        setIsGenerating,
+        setGeneratedImage,
+        setImageCount,
+        setGeneratedImages
+    } = useImageGenerator();
 
     const handleGenerate = async () => {
         if (!prompt?.trim()) return
@@ -54,12 +54,11 @@ export const ImageDescriptor = ({ prompt, size, generatedImage, generatedImages,
         }
     }
 
-
     return (
         <Card className="h-fit">
             <CardHeader className="pb-2">
                 <CardTitle>Image Prompt</CardTitle>
-                <CardDescription>Describe the image you want to generate in detail</CardDescription>
+                <CardDescription>Describe the {imageCount === "1" ? 'image' : 'images'} you want to generate in detail</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 pt-2">
                 <div className="space-y-2">
@@ -73,19 +72,34 @@ export const ImageDescriptor = ({ prompt, size, generatedImage, generatedImages,
                     />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 w-full">
                     <Label htmlFor="size">Image Size (WxH)</Label>
                     <Select value={size} onValueChange={setSize}>
-                        <SelectTrigger id="size">
+                        <SelectTrigger id="size" className="w-full">
                             <SelectValue placeholder="Select size" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="w-full">
                             <SelectItem value="512x512">512x512 (Square)</SelectItem>
                             <SelectItem value="512x768">512x768 (Portrait)</SelectItem>
                             <SelectItem value="768x768">768x768 (Square)</SelectItem>
                             <SelectItem value="1024x1024">1024x1024 (Square)</SelectItem>
                             <SelectItem value="1024x1792">1024x1792 (Portrait)</SelectItem>
                             <SelectItem value="1792x1024">1792x1024 (Landscape)</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="count">Number of Images</Label>
+                    <Select value={imageCount} onValueChange={setImageCount}>
+                        <SelectTrigger id="count" className="w-full">
+                            <SelectValue placeholder="Choose the number of images which will get generated" />
+                        </SelectTrigger>
+                        <SelectContent className="w-full">
+                            <SelectItem value="1">1</SelectItem>
+                            <SelectItem value="2">2</SelectItem>
+                            <SelectItem value="3">3</SelectItem>
+                            <SelectItem value="4">4</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -115,7 +129,7 @@ export const ImageDescriptor = ({ prompt, size, generatedImage, generatedImages,
                     ) : (
                         <>
                             <ImageIcon className="mr-2 h-4 w-4" />
-                            Generate Image
+                            {imageCount === "1" ? "Generate Image" : `Generate ${imageCount} Images`}
                         </>
                     )}
                 </Button>

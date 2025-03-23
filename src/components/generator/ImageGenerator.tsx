@@ -3,15 +3,12 @@
 import { Download, ImageIcon, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
-import { toast } from "sonner";
+import { Carousel, CarouselContent } from "../ui/carousel";
+import { useImageGenerator } from "../../../context/ImageGeneratrorContext";
 
-type ImageGeneratorProps = {
-    isGenerating: boolean;
-    generatedImage: string | undefined;
-    handleImageDownload: (imageUrl: string) => void;
-}
+export const ImageGenerator = () => {
+    const { isGenerating, imageCount, generatedImage, handleImageDownload } = useImageGenerator();
 
-export const ImageGenerator = ({ isGenerating, generatedImage, handleImageDownload }: ImageGeneratorProps) => {
     return (
         <Card className="h-fit">
             <CardHeader className="pb-2">
@@ -23,9 +20,17 @@ export const ImageGenerator = ({ isGenerating, generatedImage, handleImageDownlo
                     {isGenerating ? (
                         <div className="flex flex-col items-center justify-center space-y-2">
                             <Loader2 className="h-10 w-10 animate-spin text-primary" />
-                            <p className="text-sm text-muted-foreground">Generating your image...</p>
+                            <p className="text-sm text-muted-foreground">Generating your {imageCount === '1' ? 'image' : 'images'}...
+                            </p>
                         </div>
                     ) : generatedImage ? (
+                        // Number.parseInt(imageCount) > 1 ? (
+                        //     <Carousel className="w-full">
+                        //         <CarouselContent>
+                        //             {/* {generatedImages.filter((img) => img.prompt === prompt)} */}
+                        //         </CarouselContent>
+                        //     </Carousel>
+                        // )
                         <img
                             src={generatedImage || "/placeholder.svg"}
                             alt="Generated image"
