@@ -1,42 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import { TabsContent } from "@radix-ui/react-tabs";
 import { ImageDescriptor } from "./ImageDescriptor";
 import { ImageGenerator } from "./ImageGenerator";
 import { ImageAnalyzer } from "./ImageAnalyzer";
 import { ImageGallery } from "./ImageGallery";
-
-export type GeneratedImage = {
-    id: string
-    url: string
-    prompt: string
-    timestamp: Date
-    size: string
-}
+import { useImageGenerator } from "../../../context/ImageGeneratrorContext";
 
 export const GeneratorComponent = () => {
-    const [prompt, setPrompt] = useState<string | undefined>('');
-    const [size, setSize] = useState<string | undefined>("512x512");
-    const [generatedImage, setGeneratedImage] = useState<string | undefined>(undefined);
-    const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([])
-    const [activeTab, setActiveTab] = useState<string>("generate");
-    const [isGenerating, setIsGenerating] = useState<boolean>(false);
-
-    const handleImageDownload = (imageUrl: string) => {
-        if (generatedImage) {
-            const link = document.createElement("a");
-            link.href = imageUrl;
-            link.download = `generated-image-${Date.now()}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            toast.success("Image downloaded");
-        }
-    };
+    const { activeTab, setActiveTab, generatedImages} = useImageGenerator();
 
     return (
         <main className="container mx-auto py-10 px-4 md:px-6 flex-1">
@@ -50,34 +23,15 @@ export const GeneratorComponent = () => {
 
                 <TabsContent value="generate" className="mt-0">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <ImageDescriptor prompt={prompt}
-                            setPrompt={setPrompt}
-                            size={size} setSize={setSize}
-                            generatedImage={generatedImage}
-                            setGeneratedImage={setGeneratedImage}
-                            generatedImages={generatedImages}
-                            setGeneratedImages={setGeneratedImages}
-                            isGenerating={isGenerating}
-                            setIsGenerating={setIsGenerating}
-                        />
-                        <ImageGenerator isGenerating={false}
-                            generatedImage={generatedImage}
-                            handleImageDownload={handleImageDownload} />
+                        <ImageDescriptor />
+                        <ImageGenerator />
                     </div>
                 </TabsContent>
                 <TabsContent value="upload" className="mt-0">
-                    <ImageAnalyzer prompt={prompt}
-                        setPrompt={setPrompt}
-                        setActiveTab={setActiveTab}
-                        setGeneratedImage={setGeneratedImage} />
+                    <ImageAnalyzer />
                 </TabsContent>
                 <TabsContent value="gallery" className="mt-0">
-                    <ImageGallery generatedImages={generatedImages}
-                        setGeneratedImages={setGeneratedImages}
-                        setActiveTab={setActiveTab}
-                        handleImageDownload={handleImageDownload}
-                        setGeneratedImage={setGeneratedImage}
-                        setPrompt={setPrompt} />
+                    <ImageGallery />
                 </TabsContent>
             </Tabs>
         </main>
