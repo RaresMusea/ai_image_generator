@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, ImageIcon, Loader2, Maximize2 } from "lucide-react";
+import { Download, ImageIcon, ListRestart, Loader2, Maximize2, RotateCcw, Trash, Trash2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Carousel, CarouselApi, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../ui/carousel";
@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { Lightbox } from "../ui/lightbox";
 
 export const ImageGenerator = () => {
-    const { prompt, isGenerating, imageCount, generatedImage, generatedImages, setGeneratedImage, handleImageDownload, multipleGenerated } = useImageGenerator();
+    const { prompt, isGenerating, imageCount, generatedImage, generatedImages, setGeneratedImage, handleImageDownload, multipleGenerated, setMultipleGenerated, setPrompt } = useImageGenerator();
     const { lightboxOpen, lightboxImages, lightboxIndex, setLightboxOpen, openGeneratedImagesLightbox } = useLightbox();
     const [currentIndex, setCurrentIndex] = useState<number>(0);
     const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
@@ -42,6 +42,7 @@ export const ImageGenerator = () => {
 
     }, [carouselApi]);
 
+
     return (
         <Card className="h-fit">
             <CardHeader className="pb-2">
@@ -49,7 +50,7 @@ export const ImageGenerator = () => {
                 <CardDescription>Your AI-generated {imageCount === '1' ? 'image' : 'images'} will appear here</CardDescription>
             </CardHeader>
             <CardContent className="flex justify-center items-center pt-2">
-                <div className="relative w-full bg-muted rounded-lg overflow-hidden flex items-center justify-center lg:h-[320px] h-auto aspect-square lg:aspect-auto">
+                <div className={`relative w-full bg-muted rounded-lg overflow-hidden flex items-center justify-center ${(multipleGenerated.length !== 0) ? 'lg:h-[512px]' : 'lg:h-[330px]'} h-auto aspect-square lg:aspect-auto`}>
                     {isGenerating ? (
                         <div className="flex flex-col items-center justify-center space-y-2">
                             <Loader2 className="h-10 w-10 animate-spin text-primary" />
@@ -61,6 +62,10 @@ export const ImageGenerator = () => {
                             <Button variant="ghost" size="icon" className="absolute top-2 right-2 z-10 bg-background/50 hover:bg-background/80" onClick={() => { imageCount === '1' ? openGeneratedImagesLightbox(0, multipleGenerated) : openGeneratedImagesLightbox(currentIndex, multipleGenerated) }}>
                                 <Maximize2 className="h4 w-4" />
                                 <span className="sr-only">View fullscreen</span>
+                            </Button>
+                            <Button variant="ghost" size="icon" className="absolute top-12 right-2 z-10 bg-background/50 hover:bg-background/80" onClick={() => {setGeneratedImage(undefined); setPrompt(undefined); setMultipleGenerated([])}}>
+                                <RotateCcw className="h4 w-4" />
+                                <span className="sr-only">Revert</span>
                             </Button>
 
                             {

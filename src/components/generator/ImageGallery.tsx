@@ -9,6 +9,7 @@ import { useLightbox } from "../../../context/LightboxContext";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../ui/carousel";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
 import { Lightbox } from "../ui/lightbox";
+import Image from "next/image";
 
 export const ImageGallery = () => {
     const { generatedImages, setActiveTab, setPrompt, setGeneratedImage, setGeneratedImages, handleImageDownload } = useImageGenerator();
@@ -118,9 +119,9 @@ export const ImageGallery = () => {
                                                     dragFree: false,
                                                 }}
                                             >
-                                                <CarouselContent className="h-full">
+                                                <CarouselContent className="object-cover">
                                                     {batch.map((image, index) => (
-                                                        <CarouselItem key={image.id} className="h-full">
+                                                        <CarouselItem key={image.id} className="h-full aspect-square">
                                                             <div className="h-full relative">
                                                                 <img
                                                                     src={image.url || "/placeholder.svg"}
@@ -139,9 +140,10 @@ export const ImageGallery = () => {
                                                 <CarouselNext className="right-2" />
                                             </Carousel>
                                         ) : (
-                                            // Single image
-                                            <img
+                                            <Image
                                                 src={firstImage.url || "/placeholder.svg"}
+                                                width={512}
+                                                height={512}
                                                 alt={firstImage.prompt}
                                                 className="w-full h-full object-cover cursor-pointer"
                                                 onClick={() => openGalleryLightbox(generatedImages, generationToken, 0)}
@@ -153,14 +155,14 @@ export const ImageGallery = () => {
                                             </div>
                                         )}
                                     </div>
-                                    <div className="p-3">
+                                    <div className="p-3 mt-4">
                                         <p className="text-xs text-muted-foreground mb-1">
                                             {formatDate(firstImage.timestamp)} • {firstImage.size}
                                         </p>
                                         <p className="text-sm line-clamp-2 mb-3">{firstImage.prompt}</p>
                                         <div className="flex space-x-2">
                                             {isBatch ? (
-                                                <div className="flex-1">
+                                                <div className="flex-1 w-100">
                                                     <Select onValueChange={(value) => {
                                                         if (value === 'all') {
                                                             batch.forEach(im => handleImageDownload(im.url));
@@ -169,9 +171,9 @@ export const ImageGallery = () => {
                                                         handleImageDownload(value)
                                                     }
                                                     }>
-                                                        <SelectTrigger className="h-8 text-xs">
+                                                        <SelectTrigger className="h-8 w-40 text-xs">
                                                             <Download className="h-3 w-3 mr-1" />
-                                                            <span>Download</span>
+                                                            Download
                                                         </SelectTrigger>
                                                         <SelectContent>
                                                             {batch.map((image, index) => (
@@ -191,7 +193,6 @@ export const ImageGallery = () => {
                                                     </Select>
                                                 </div>
                                             ) : (
-                                                // For single images, show the download button
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
@@ -210,7 +211,6 @@ export const ImageGallery = () => {
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => {
-                                                    // Delete all images in the batch
                                                     batch.forEach((image) => handleDelete(image.id))
                                                 }}
                                             >
