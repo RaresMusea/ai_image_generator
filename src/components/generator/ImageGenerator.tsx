@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, ImageIcon, ListRestart, Loader2, Maximize2, RotateCcw, Trash, Trash2 } from "lucide-react";
+import { Download, ImageIcon, ListRestart, Loader2, Maximize2, RotateCcw, Trash, Trash2, X } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Carousel, CarouselApi, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../ui/carousel";
@@ -8,6 +8,9 @@ import { useImageGenerator } from "../../../context/ImageGeneratrorContext";
 import { useLightbox } from "../../../context/LightboxContext";
 import { useEffect, useState } from "react";
 import { Lightbox } from "../ui/lightbox";
+import { getImageResolution } from "@/lib/ImageUtils";
+import Image from "next/image";
+import React from "react";
 
 export const ImageGenerator = () => {
     const { prompt, isGenerating, imageCount, generatedImage, generatedImages, setGeneratedImage, handleImageDownload, multipleGenerated, setMultipleGenerated, setPrompt } = useImageGenerator();
@@ -50,7 +53,7 @@ export const ImageGenerator = () => {
                 <CardDescription>Your AI-generated {imageCount === '1' ? 'image' : 'images'} will appear here</CardDescription>
             </CardHeader>
             <CardContent className="flex justify-center items-center pt-2">
-                <div className={`relative w-full bg-muted rounded-lg overflow-hidden flex items-center justify-center ${(multipleGenerated.length !== 0) ? 'lg:h-[512px]' : 'lg:h-[330px]'} h-auto aspect-square lg:aspect-auto`}>
+                <div className={`relative w-full bg-muted rounded-lg overflow-hidden flex items-center justify-center lg:h-[330px] h-auto aspect-square lg:aspect-auto`}>
                     {isGenerating ? (
                         <div className="flex flex-col items-center justify-center space-y-2">
                             <Loader2 className="h-10 w-10 animate-spin text-primary" />
@@ -59,15 +62,16 @@ export const ImageGenerator = () => {
                         </div>
                     ) : generatedImage ? (
                         <>
+
                             <Button variant="ghost" size="icon" className="absolute top-2 right-2 z-10 bg-background/50 hover:bg-background/80" onClick={() => { imageCount === '1' ? openGeneratedImagesLightbox(0, multipleGenerated) : openGeneratedImagesLightbox(currentIndex, multipleGenerated) }}>
                                 <Maximize2 className="h4 w-4" />
                                 <span className="sr-only">View fullscreen</span>
                             </Button>
-                            <Button variant="ghost" size="icon" className="absolute top-12 right-2 z-10 bg-background/50 hover:bg-background/80" onClick={() => {setGeneratedImage(undefined); setPrompt(undefined); setMultipleGenerated([])}}>
-                                <RotateCcw className="h4 w-4" />
+
+                            <Button variant="ghost" size="icon" className="absolute top-12 right-2 z-10 bg-background/50 hover:bg-background/80" onClick={() => { setGeneratedImage(undefined); setPrompt(undefined); setMultipleGenerated([]);}}>
+                                <X className="h4 w-4" />
                                 <span className="sr-only">Revert</span>
                             </Button>
-
                             {
                                 Number.parseInt(imageCount) > 1 ? (
                                     <Carousel className="w-full" opts={{ loop: false, skipSnaps: false, dragFree: false, duration: 20, align: "start" }} setApi={setCarouselApi}>
@@ -77,10 +81,12 @@ export const ImageGenerator = () => {
                                                     <>
                                                         <CarouselItem key={im.id} className="relative">
                                                             <div className="p-1 full flex flex-col items-center relative">
-                                                                <img src={im.url || "/placeholder.svg"}
+                                                                <Image src={im.url || "/placeholder.svg"}
+                                                                    width={getImageResolution(im.size)?.width || 512}
+                                                                    height={getImageResolution(im.size)?.height || 512}
                                                                     alt={`Generated image ${idx + 1}`}
                                                                     className="w-full h-full object-contain cursor-pointer"
-                                                                    onClick={() => { }}
+                                                                    onClick={() => openGeneratedImagesLightbox(idx, multipleGenerated)}
                                                                 />
                                                                 <div className="absolute bottom-0 left-0 right-0 bg-background/80 p-2 flex flex-col items-center z-50">
                                                                     <p id='currentIndex' className="text-xs text-center mb-1 text-foreground">
@@ -96,9 +102,12 @@ export const ImageGenerator = () => {
                                         <CarouselNext className="right-2" />
                                     </Carousel>
                                 ) : (
-                                    <img
+                                    <Image
+                                        width={getImageResolution(generatedImage)?.width || 512}
+                                        height={getImageResolution(generatedImage)?.height || 512}
                                         src={generatedImage || "/placeholder.svg"}
                                         alt="Generated image"
+                                        onClick={() => openGeneratedImagesLightbox(0, generatedImages)}
                                         className="w-full h-full object-contain"
                                     />
                                 )}
@@ -110,7 +119,7 @@ export const ImageGenerator = () => {
                         </div>
                     )}
                 </div>
-            </CardContent>
+            </CardContent >
             <CardFooter className="pt-2">
                 <Button
                     variant="outline"
@@ -136,6 +145,6 @@ export const ImageGenerator = () => {
                 initialIndex={lightboxIndex}
                 onDownload={handleImageDownload}
             />
-        </Card>
+        </Card >
     );
 }

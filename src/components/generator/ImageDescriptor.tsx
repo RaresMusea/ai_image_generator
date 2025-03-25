@@ -121,10 +121,10 @@ export const ImageDescriptor = () => {
                             <SelectValue placeholder="Choose the number of images which will get generated" />
                         </SelectTrigger>
                         <SelectContent className="w-full">
-                            <SelectItem value="1">1</SelectItem>
-                            <SelectItem value="2">2</SelectItem>
-                            <SelectItem value="3">3</SelectItem>
-                            <SelectItem value="4">4</SelectItem>
+                            <SelectItem value="1">1 image</SelectItem>
+                            <SelectItem value="2">2 images</SelectItem>
+                            <SelectItem value="3">3 images</SelectItem>
+                            <SelectItem value="4">4 images</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>

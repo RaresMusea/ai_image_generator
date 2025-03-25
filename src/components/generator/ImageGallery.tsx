@@ -10,9 +10,10 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
 import { Lightbox } from "../ui/lightbox";
 import Image from "next/image";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog";
 
 export const ImageGallery = () => {
-    const { generatedImages, setActiveTab, setPrompt, setGeneratedImage, setGeneratedImages, handleImageDownload } = useImageGenerator();
+    const { generatedImages, setActiveTab, setPrompt, setGeneratedImage, setGeneratedImages, setImageCount, setSize, handleImageDownload, setMultipleGenerated } = useImageGenerator();
     const { openGalleryLightbox, lightboxImages, lightboxOpen, lightboxIndex, setLightboxOpen } = useLightbox();
 
     const formatDate = (date: Date) => {
@@ -34,11 +35,19 @@ export const ImageGallery = () => {
         });
     };
 
-    const handleDelete = (id: string) => {
-        setGeneratedImages(generatedImages.filter((img: GeneratedImage) => img.id !== id));
+    const handleDelete = (token: string) => {
+        const prevLen: number = generatedImages.length;
+        const newLen: number = generatedImages.filter((img: GeneratedImage) => img.generationToken !== token).length;
 
-        toast("Image deleted", {
-            description: "The image has been removed from your gallery.",
+        setGeneratedImages(generatedImages.filter((img: GeneratedImage) => img.generationToken !== token));
+        setMultipleGenerated([]);
+        setGeneratedImage(undefined);
+        setPrompt('');
+        setImageCount('1');
+        setSize('512x512');
+
+        toast.success(`${prevLen - newLen !== 1 ? 'Images' : 'Image'} deleted`, {
+            description: `${prevLen - newLen !== 1 ? prevLen - newLen + ' images were successfully removed' : 'The image has been removed'} from your gallery`,
         })
     };
 
@@ -51,26 +60,6 @@ export const ImageGallery = () => {
     }, {} as Record<string, GeneratedImage[]>);
 
     return (
-        // <Card>
-        //     <CardHeader>
-        //         <CardTitle>Generated Images Gallery</CardTitle>
-        //         <CardDescription>View and manage your previously generated images</CardDescription>
-        //     </CardHeader>
-        //     <CardContent>
-        //         {generatedImages.length === 0 ? (
-        //             <div className="text-center py-12">
-        //                 <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
-        //                 <h3 className="mt-4 text-lg font-medium">No images yet</h3>
-        //                 <p className="mt-2 text-sm text-muted-foreground">Generate your first image to see it here</p>
-        //                 <Button variant="outline" className="mt-4" onClick={() => setActiveTab("generate")}>
-        //                     Generate an image
-        //                 </Button>
-        //             </div>
-        //         ) : null
-
-        // }
-        //     </CardContent>
-        // </Card >
         <Card>
             <CardHeader>
                 <CardTitle>Generated Images Gallery</CardTitle>
@@ -82,7 +71,7 @@ export const ImageGallery = () => {
                         <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
                         <h3 className="mt-4 text-lg font-medium">No images yet</h3>
                         <p className="mt-2 text-sm text-muted-foreground">Generate your first image to see it here</p>
-                        <Button variant="outline" className="mt-4" onClick={() => setActiveTab("create")}>
+                        <Button variant="outline" className="mt-4" onClick={() => setActiveTab("generate")}>
                             Create an image
                         </Button>
                     </div>
@@ -96,7 +85,6 @@ export const ImageGallery = () => {
                             return (
                                 <div key={generationToken} className="border rounded-lg overflow-hidden bg-card">
                                     <div className="aspect-square relative">
-                                        {/* Expand button for lightbox */}
                                         <Button
                                             variant="ghost"
                                             size="icon"
@@ -108,7 +96,6 @@ export const ImageGallery = () => {
                                         </Button>
 
                                         {isBatch ? (
-                                            // Carousel for batches with multiple images
                                             <Carousel
                                                 className="w-full h-full"
                                                 opts={{
@@ -207,16 +194,33 @@ export const ImageGallery = () => {
                                                 <Copy className="h-3 w-3" />
                                                 <span className="sr-only">Copy prompt</span>
                                             </Button>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => {
-                                                    batch.forEach((image) => handleDelete(image.id))
-                                                }}
-                                            >
-                                                <Trash2 className="h-3 w-3" />
-                                                <span className="sr-only">Delete</span>
-                                            </Button>
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <Button variant="outline" size="sm">
+                                                        <Trash2 className="h-3 w-3" />
+                                                        <span className="sr-only">Delete</span>
+                                                    </Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                    <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+                                                    <AlertDialogDescription>
+                                                        Are you sure you want to delete {batch.length === 1 ? 'this image?' : `these ${batch.length} images?`} This action cannot be undone.
+                                                    </AlertDialogDescription>
+                                                    <div className="flex justify-end space-x-2 mt-4">
+                                                        <AlertDialogCancel asChild>
+                                                            <Button variant="outline" className="font-bold">Cancel</Button>
+                                                        </AlertDialogCancel>
+                                                        <AlertDialogAction asChild>
+                                                            <Button
+                                                                className="bg-red-600 hover:bg-red-800 text-white font-bold"
+                                                                onClick={() => handleDelete(firstImage.generationToken)}
+                                                            >
+                                                                Delete
+                                                            </Button>
+                                                        </AlertDialogAction>
+                                                    </div>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
                                         </div>
                                     </div>
                                 </div>
