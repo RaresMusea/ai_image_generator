@@ -3,6 +3,7 @@ import { toast } from "sonner";
 
 interface ImageGeneratorContextProps {
     prompt: string | undefined;
+    imageTransformPrompt: string | undefined;
     size: string | undefined;
     generatedImage :string | undefined;
     generatedImages: GeneratedImage[];
@@ -11,6 +12,7 @@ interface ImageGeneratorContextProps {
     imageCount: string;
     multipleGenerated: GeneratedImage[];
     setPrompt: (newPrompt: string | undefined) => void;
+    setImageTransformPrompt: (newPrompt: string | undefined) => void;
     setSize: (newSize: string | undefined) => void;
     setGeneratedImage: (newSize: string | undefined) => void;
     setGeneratedImages: (newGeneratedImages: GeneratedImage[]) => void;
@@ -41,6 +43,7 @@ export const ImageGeneratorProvider: React.FC<{children: React.ReactNode}> = ({c
         const [isGenerating, setIsGenerating] = useState<boolean>(false);
         const [imageCount, setImageCount] = useState<string>("1");
         const [multipleGenerated, setMultipleGenerated] = useState<GeneratedImage[]>([]);
+        const [imageTransformPrompt, setImageTransformPrompt] = useState<string | undefined>('');
 
         useEffect(() => {
             if (imageCount !== "1" && generatedImage) {
@@ -65,6 +68,7 @@ export const ImageGeneratorProvider: React.FC<{children: React.ReactNode}> = ({c
     return (
         <ImageGeneratorContext.Provider value={{
             prompt,
+            imageTransformPrompt,
             size,
             generatedImage,
             generatedImages,
@@ -73,6 +77,7 @@ export const ImageGeneratorProvider: React.FC<{children: React.ReactNode}> = ({c
             imageCount,
             multipleGenerated,
             setPrompt,
+            setImageTransformPrompt,
             setSize,
             setGeneratedImage,
             setGeneratedImages,
