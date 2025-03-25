@@ -1,12 +1,13 @@
 import { getImageResolution, ImageResolution } from "@/lib/ImageUtils";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
+import cuid from 'cuid';
 
 const PORT: string = '7861';
 const URL: string = `http://localhost:${PORT}`
 
 export async function POST(request: NextRequest) {
-    const {prompt, size, seed} = await request.json();
+    const { prompt, size, seed, imageCount } = await request.json();
 
     const imageResolution = getImageResolution(size);
 
@@ -14,22 +15,25 @@ export async function POST(request: NextRequest) {
         return new NextResponse('Invalid image size', { status: 400 });
     }
 
+    const samples: number = Number.parseInt(imageCount);
     const response = await axios.post(`${URL}/sdapi/v1/txt2img`, {
         prompt,
         width: imageResolution.width,
         height: imageResolution.height,
-        samples: 1,
-        seed,
+        batch_size: samples,
+        seed: seed,
         num_inference_steps: 50,
         cfg_scale: 7
     });
 
     if (!response.data.images || response.data.length === 0) {
-        return new NextResponse("Unable to perform image generation.", {status: 500});
+        return new NextResponse("Unable to perform image generation.", { status: 500 });
     }
 
-    const imageBase64 = response.data.images[0];
-    const imageDataUri = `data:image/png;base64,${imageBase64}`;
+    console.log(response.data);
+    const imagesBase64: string[] = response.data.images;
+    const imagesDataUri = imagesBase64.map((i64: string) => `data:image/png;base64,${i64}`);
+    const generationToken: string = cuid();
 
-    return NextResponse.json({image: imageDataUri}, {status: 201});
+    return NextResponse.json({ images: imagesDataUri, generationToken }, { status: 201 });
 }

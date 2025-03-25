@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card"
 import { Label } from "../ui/label";
@@ -14,18 +14,21 @@ import { GeneratedImage, useImageGenerator } from "../../../context/ImageGenerat
 
 export const ImageDescriptor = () => {
     const [seed, setSeed] = useState<number>(0);
+
     const {
         prompt,
         size,
         imageCount,
         isGenerating,
         generatedImages,
+        multipleGenerated,
         setPrompt,
         setSize,
         setIsGenerating,
         setGeneratedImage,
         setImageCount,
-        setGeneratedImages
+        setGeneratedImages,
+        setMultipleGenerated
     } = useImageGenerator();
 
     const handleGenerate = async () => {
@@ -35,17 +38,39 @@ export const ImageDescriptor = () => {
         setGeneratedImage(undefined);
 
         try {
-            const { data } = await axios.post("/api/proxy/generate", { prompt, size, seed });
-            const newImage: GeneratedImage = {
-                id: Date.now().toString(),
-                url: data.image,
-                prompt,
-                timestamp: new Date(),
-                size: size || "1024x1024",
-            };
-            setGeneratedImage(newImage.url);
-            setGeneratedImages([newImage, ...generatedImages]);
-            toast.success("Image generated successfully!")
+            const { data } = await axios.post("/api/proxy/generate", { prompt, size, seed, imageCount });
+            if (data.images.length === 1) {
+                const newImage: GeneratedImage = {
+                    id: Date.now().toString(),
+                    generationToken: data.generationToken,
+                    url: data.images[0],
+                    prompt,
+                    timestamp: new Date(),
+                    size: size || "512x512",
+                };
+                setGeneratedImage(newImage.url);
+                setMultipleGenerated([newImage]);
+                setGeneratedImages([newImage, ...generatedImages]);
+                toast.success("Image generated successfully!")
+            }
+            else {
+                const newImages: GeneratedImage[] = [];
+                data.images.forEach((i: string, idx: number) => {
+                    newImages.push({
+                        id: (Date.now() + idx).toString(),
+                        generationToken: data.generationToken,
+                        url: i,
+                        prompt,
+                        timestamp: new Date(),
+                        size: size || '512x512'
+                    })
+                });
+
+                setGeneratedImage(newImages[0].url);
+                setMultipleGenerated(newImages);
+                setGeneratedImages([...newImages, ...generatedImages]);
+                toast.success(`${imageCount} images were successfully generated!`);
+            }
         } catch (error) {
             console.error("Failed to generate image:", error);
             toast.error("Failed to generate image. Please try again later.");
@@ -96,10 +121,10 @@ export const ImageDescriptor = () => {
                             <SelectValue placeholder="Choose the number of images which will get generated" />
                         </SelectTrigger>
                         <SelectContent className="w-full">
-                            <SelectItem value="1">1</SelectItem>
-                            <SelectItem value="2">2</SelectItem>
-                            <SelectItem value="3">3</SelectItem>
-                            <SelectItem value="4">4</SelectItem>
+                            <SelectItem value="1">1 image</SelectItem>
+                            <SelectItem value="2">2 images</SelectItem>
+                            <SelectItem value="3">3 images</SelectItem>
+                            <SelectItem value="4">4 images</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
