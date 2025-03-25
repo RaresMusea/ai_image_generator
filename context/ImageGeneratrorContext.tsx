@@ -30,6 +30,7 @@ export type GeneratedImage = {
     prompt: string
     timestamp: Date
     size: string
+    sourceImageUrl?: string
 };
 
 const ImageGeneratorContext = createContext<ImageGeneratorContextProps | undefined>(undefined);

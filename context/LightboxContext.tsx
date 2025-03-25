@@ -10,6 +10,7 @@ interface LightboxContextProps {
     setLightboxIndex: (newLightboxIndex: number) => void;
     openGeneratedImagesLightbox: (index: number, generatedImages: GeneratedImage[]) => void;
     openGalleryLightbox: (generatedImages: GeneratedImage[], batchId: string, index: number) => void;
+    openTransformerGeneratorLightbox: (index: number) => void;
 };
 
 type LightboxSourcesProps = {
@@ -55,6 +56,10 @@ export const LightboxProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setLightboxOpen(true);
     }
 
+    const openTransformerGeneratorLightbox = (index: number) => {
+
+    };
+
     return (
         <LightboxContext.Provider value={{
             lightboxOpen,
@@ -63,6 +68,7 @@ export const LightboxProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             setLightboxIndex,
             setLightboxImages,
             openGeneratedImagesLightbox,
+            openTransformerGeneratorLightbox,
             openGalleryLightbox,
             setLightboxOpen
         }}>

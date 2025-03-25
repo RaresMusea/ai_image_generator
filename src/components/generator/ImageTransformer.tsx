@@ -12,14 +12,15 @@ import { Tooltip, TooltipTrigger } from "@radix-ui/react-tooltip";
 import { TooltipContent } from "../ui/tooltip";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Button } from "../ui/button";
+import { useImageTransformer } from "../../../context/ImageTransformerContext";
 
 
 export const ImageTransformer = () => {
-    const sourceImageInputRef = useRef<HTMLInputElement>(null);
     const [denoisingStrength, setDenoisingStrength] = useState<number>(0);
     const { imageTransformPrompt, imageCount, size, isGenerating, setIsGenerating, setImageCount, setImageTransformPrompt, setSize } = useImageGenerator();
+    const {uploadedImage, setUploadedImage, sourceImageInputRef} = useImageTransformer();
     const [resizeMode, setResizeMode] = useState<string>('1');
-    const [uploadedImage, setUploadedImage] = useState<string | undefined>(undefined);
+
 
     return (
         <Card className="h-fit">
