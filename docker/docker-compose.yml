@@ -4,10 +4,9 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "7860:7860"
       - "7861:7861"
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
     runtime: nvidia
     volumes:
-      - /app
+      - "${SD_LOCAL_MODEL_PATH}:/app/models/Stable-diffusion"

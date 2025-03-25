@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card"
 import { Label } from "../ui/label";
@@ -10,23 +10,26 @@ import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import { toast } from "sonner"
 import { ImageIcon, Loader2 } from "lucide-react";
-import { GeneratedImage } from "./GeneratorComponent";
+import { GeneratedImage, useImageGenerator } from "../../../context/ImageGeneratrorContext";
 
-type ImageDescriptorProps = {
-    prompt: string | undefined;
-    setPrompt: (prompt: string | undefined) => void;
-    size: string | undefined;
-    setSize: (newSize: string | undefined) => void;
-    generatedImage: string | undefined;
-    setGeneratedImage: (newImage: string | undefined) => void;
-    generatedImages: GeneratedImage[];
-    setGeneratedImages: (newGeneratedImages: GeneratedImage[]) => void;
-    isGenerating: boolean;
-    setIsGenerating: (state: boolean) => void;
-}
-
-export const ImageDescriptor = ({ prompt, size, generatedImage, generatedImages, isGenerating, setIsGenerating, setPrompt, setSize, setGeneratedImage, setGeneratedImages }: ImageDescriptorProps) => {
+export const ImageDescriptor = () => {
     const [seed, setSeed] = useState<number>(0);
+
+    const {
+        prompt,
+        size,
+        imageCount,
+        isGenerating,
+        generatedImages,
+        multipleGenerated,
+        setPrompt,
+        setSize,
+        setIsGenerating,
+        setGeneratedImage,
+        setImageCount,
+        setGeneratedImages,
+        setMultipleGenerated
+    } = useImageGenerator();
 
     const handleGenerate = async () => {
         if (!prompt?.trim()) return
@@ -35,17 +38,39 @@ export const ImageDescriptor = ({ prompt, size, generatedImage, generatedImages,
         setGeneratedImage(undefined);
 
         try {
-            const { data } = await axios.post("/api/proxy/generate", { prompt, size, seed });
-            const newImage: GeneratedImage = {
-                id: Date.now().toString(),
-                url: data.image,
-                prompt,
-                timestamp: new Date(),
-                size: size || "1024x1024",
-            };
-            setGeneratedImage(newImage.url);
-            setGeneratedImages([newImage, ...generatedImages]);
-            toast.success("Image generated successfully!")
+            const { data } = await axios.post("/api/proxy/generate", { prompt, size, seed, imageCount });
+            if (data.images.length === 1) {
+                const newImage: GeneratedImage = {
+                    id: Date.now().toString(),
+                    generationToken: data.generationToken,
+                    url: data.images[0],
+                    prompt,
+                    timestamp: new Date(),
+                    size: size || "512x512",
+                };
+                setGeneratedImage(newImage.url);
+                setMultipleGenerated([newImage]);
+                setGeneratedImages([newImage, ...generatedImages]);
+                toast.success("Image generated successfully!")
+            }
+            else {
+                const newImages: GeneratedImage[] = [];
+                data.images.forEach((i: string, idx: number) => {
+                    newImages.push({
+                        id: (Date.now() + idx).toString(),
+                        generationToken: data.generationToken,
+                        url: i,
+                        prompt,
+                        timestamp: new Date(),
+                        size: size || '512x512'
+                    })
+                });
+
+                setGeneratedImage(newImages[0].url);
+                setMultipleGenerated(newImages);
+                setGeneratedImages([...newImages, ...generatedImages]);
+                toast.success(`${imageCount} images were successfully generated!`);
+            }
         } catch (error) {
             console.error("Failed to generate image:", error);
             toast.error("Failed to generate image. Please try again later.");
@@ -54,12 +79,11 @@ export const ImageDescriptor = ({ prompt, size, generatedImage, generatedImages,
         }
     }
 
-
     return (
         <Card className="h-fit">
             <CardHeader className="pb-2">
                 <CardTitle>Image Prompt</CardTitle>
-                <CardDescription>Describe the image you want to generate in detail</CardDescription>
+                <CardDescription>Describe the {imageCount === "1" ? 'image' : 'images'} you want to generate in detail</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 pt-2">
                 <div className="space-y-2">
@@ -73,19 +97,34 @@ export const ImageDescriptor = ({ prompt, size, generatedImage, generatedImages,
                     />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 w-full">
                     <Label htmlFor="size">Image Size (WxH)</Label>
                     <Select value={size} onValueChange={setSize}>
-                        <SelectTrigger id="size">
+                        <SelectTrigger id="size" className="w-full">
                             <SelectValue placeholder="Select size" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="w-full">
                             <SelectItem value="512x512">512x512 (Square)</SelectItem>
                             <SelectItem value="512x768">512x768 (Portrait)</SelectItem>
                             <SelectItem value="768x768">768x768 (Square)</SelectItem>
                             <SelectItem value="1024x1024">1024x1024 (Square)</SelectItem>
                             <SelectItem value="1024x1792">1024x1792 (Portrait)</SelectItem>
                             <SelectItem value="1792x1024">1792x1024 (Landscape)</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="count">Number of Images</Label>
+                    <Select value={imageCount} onValueChange={setImageCount}>
+                        <SelectTrigger id="count" className="w-full">
+                            <SelectValue placeholder="Choose the number of images which will get generated" />
+                        </SelectTrigger>
+                        <SelectContent className="w-full">
+                            <SelectItem value="1">1 image</SelectItem>
+                            <SelectItem value="2">2 images</SelectItem>
+                            <SelectItem value="3">3 images</SelectItem>
+                            <SelectItem value="4">4 images</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -115,7 +154,7 @@ export const ImageDescriptor = ({ prompt, size, generatedImage, generatedImages,
                     ) : (
                         <>
                             <ImageIcon className="mr-2 h-4 w-4" />
-                            Generate Image
+                            {imageCount === "1" ? "Generate Image" : `Generate ${imageCount} Images`}
                         </>
                     )}
                 </Button>

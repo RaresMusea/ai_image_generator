@@ -9,17 +9,13 @@ import { ImageIcon, Loader2, RefreshCw, Upload } from "lucide-react";
 import { Button } from "../ui/button";
 import axios, { AxiosError } from "axios";
 import { getImageExtension } from "@/lib/ImageUtils";
+import { useImageGenerator } from "../../../context/ImageGeneratrorContext";
 
 const MAXIMUM_FILE_UPLOAD = 10 * 1024 * 1024;
 
-type ImageAnalyzerProps = {
-    prompt: string | undefined;
-    setPrompt: (newPrompt: string | undefined) => void;
-    setActiveTab: (currentActiveTab: string) => void;
-    setGeneratedImage: (currentGeneratedImage: string | undefined) => void;
-};
+export const ImageAnalyzer = () => {
+    const { setGeneratedImage, setPrompt, setActiveTab } = useImageGenerator();
 
-export const ImageAnalyzer = ({ prompt, setPrompt, setActiveTab, setGeneratedImage }: ImageAnalyzerProps) => {
     const [uploadedImage, setUploadedImage] = useState<string | undefined>('');
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);

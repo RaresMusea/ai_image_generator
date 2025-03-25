@@ -23,4 +23,8 @@ RUN python3 -m pip install --no-cache-dir -r requirements_versions.txt
 
 RUN pip install xformers
 
-CMD ["python3", "launch.py", "--api", "--nowebui", "--listen"]
+# For SD 1.0
+#CMD ["python3", "launch.py", "--api", "--nowebui", "--listen"]
+
+#SD 3.0
+CMD ["python3", "launch.py", "--api", "--nowebui", "--listen", "--ckpt", "/app/models/Stable-diffusion/sd3_medium_incl_clips_t5xxlfp16.safetensors"]
