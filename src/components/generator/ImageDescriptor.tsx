@@ -41,9 +41,9 @@ export const ImageDescriptor = () => {
             const { data } = await axios.post("/api/proxy/generate", { prompt, size, seed, imageCount });
             if (data.images.length === 1) {
                 const newImage: GeneratedImage = {
-                    id: Date.now().toString(),
+                    id: data.images[0].id,
                     generationToken: data.generationToken,
-                    url: data.images[0],
+                    url: data.images[0].url,
                     prompt,
                     timestamp: new Date(),
                     size: size || "512x512",
@@ -55,11 +55,11 @@ export const ImageDescriptor = () => {
             }
             else {
                 const newImages: GeneratedImage[] = [];
-                data.images.forEach((i: string, idx: number) => {
+                data.images.forEach((i: { id: string, url: string }) => {
                     newImages.push({
-                        id: (Date.now() + idx).toString(),
+                        id: i.id,
                         generationToken: data.generationToken,
-                        url: i,
+                        url: i.url,
                         prompt,
                         timestamp: new Date(),
                         size: size || '512x512'

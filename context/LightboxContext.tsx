@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { GeneratedImage } from "./ImageGeneratrorContext";
 
 interface LightboxContextProps {
@@ -26,7 +26,6 @@ export const LightboxProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const [lightboxIndex, setLightboxIndex] = useState<number>(0);
 
     const openGeneratedImagesLightbox = (index: number = 0, generatedImages: GeneratedImage[]) => {
-        console.log(generatedImages);
         if (generatedImages.length === 0) return;
 
         setLightboxImages(
@@ -42,7 +41,7 @@ export const LightboxProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     const openGalleryLightbox = (generatedImages: GeneratedImage[], batchId: string, index: number = 0) => {
         const batch = generatedImages.filter((img) => img.generationToken === batchId);
-
+        console.log("BATCH", batch)
         setLightboxImages(
             batch.map((img) => ({
                 id: img.id,

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { X, ChevronLeft, ChevronRight, Download } from "lucide-react"
+import { X, ChevronLeft, ChevronRight, Download, Section } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -53,7 +53,9 @@ interface LightboxProps {
 
 export function Lightbox({ images, open, onClose, initialIndex = 0, onDownload }: LightboxProps) {
     const [currentIndex, setCurrentIndex] = React.useState(initialIndex)
-    const currentImage = images[currentIndex]
+    console.log("IMAGES", images);
+    console.log("CURRENT IDX", currentIndex);
+    const currentImage = currentIndex >= images.length ? images[0] : images[currentIndex];
     const [isClosing, setIsClosing] = React.useState(false)
 
     React.useEffect(() => {
@@ -94,12 +96,6 @@ export function Lightbox({ images, open, onClose, initialIndex = 0, onDownload }
         window.addEventListener("keydown", handleKeyDown)
         return () => window.removeEventListener("keydown", handleKeyDown)
     }, [open, currentIndex, images.length])
-
-    React.useEffect(() => {
-        if (open) {
-            setCurrentIndex(initialIndex)
-        }
-    }, [open, initialIndex])
 
     const navigateNext = () => {
         if (currentIndex < images.length - 1) {

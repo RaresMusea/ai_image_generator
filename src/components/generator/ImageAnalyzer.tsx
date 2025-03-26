@@ -11,7 +11,7 @@ import axios, { AxiosError } from "axios";
 import { getImageExtension } from "@/lib/ImageUtils";
 import { useImageGenerator } from "../../../context/ImageGeneratrorContext";
 
-const MAXIMUM_FILE_UPLOAD = 10 * 1024 * 1024;
+export const MAXIMUM_FILE_UPLOAD = 13 * 1024 * 1024;
 
 export const ImageAnalyzer = () => {
     const { setGeneratedImage, setPrompt, setActiveTab } = useImageGenerator();
@@ -124,7 +124,7 @@ export const ImageAnalyzer = () => {
                                     >
                                         <Upload className="h-10 w-10 text-muted-foreground mb-2" />
                                         <span className="text-sm font-medium">Click to upload an image</span>
-                                        <span className="text-xs text-muted-foreground mt-1">JPG, PNG, GIF up to 5MB</span>
+                                        <span className="text-xs text-muted-foreground mt-1">PNG, GIF or WEBP, up to 10MB</span>
                                     </Label>
                                 </>
                                 :

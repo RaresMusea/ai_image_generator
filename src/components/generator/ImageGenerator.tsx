@@ -14,7 +14,7 @@ import React from "react";
 
 export const ImageGenerator = () => {
     const { prompt, isGenerating, imageCount, generatedImage, generatedImages, setGeneratedImage, handleImageDownload, multipleGenerated, setMultipleGenerated, setPrompt } = useImageGenerator();
-    const { lightboxOpen, lightboxImages, lightboxIndex, setLightboxOpen, openGeneratedImagesLightbox } = useLightbox();
+    const { lightboxOpen, lightboxImages, lightboxIndex, setLightboxOpen, openGeneratedImagesLightbox, setLightboxIndex } = useLightbox();
     const [currentIndex, setCurrentIndex] = useState<number>(0);
     const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
     const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null);
@@ -78,7 +78,6 @@ export const ImageGenerator = () => {
                                         <CarouselContent>
                                             {
                                                 multipleGenerated.map((im, idx) => (
-                                                    <>
                                                         <CarouselItem key={im.id} className="relative">
                                                             <div className="p-1 full flex flex-col items-center relative">
                                                                 <Image src={im.url || "/placeholder.svg"}
@@ -95,7 +94,6 @@ export const ImageGenerator = () => {
                                                                 </div>
                                                             </div>
                                                         </CarouselItem>
-                                                    </>
                                                 ))}
                                         </CarouselContent>
                                         <CarouselPrevious className="left-2" />
@@ -107,7 +105,7 @@ export const ImageGenerator = () => {
                                         height={getImageResolution(generatedImage)?.height || 512}
                                         src={generatedImage || "/placeholder.svg"}
                                         alt="Generated image"
-                                        onClick={() => openGeneratedImagesLightbox(0, generatedImages)}
+                                        onClick={() => openGeneratedImagesLightbox(0, multipleGenerated)}
                                         className="w-full h-full object-contain"
                                     />
                                 )}
@@ -141,7 +139,7 @@ export const ImageGenerator = () => {
             <Lightbox
                 images={lightboxImages}
                 open={lightboxOpen}
-                onClose={() => setLightboxOpen(false)}
+                onClose={() => { setLightboxOpen(false); setLightboxIndex(0); }}
                 initialIndex={lightboxIndex}
                 onDownload={handleImageDownload}
             />
