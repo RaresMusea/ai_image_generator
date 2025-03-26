@@ -14,7 +14,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 
 export const ImageGallery = () => {
     const { generatedImages, setActiveTab, setPrompt, setGeneratedImage, setGeneratedImages, setImageCount, setSize, handleImageDownload, setMultipleGenerated } = useImageGenerator();
-    const { openGalleryLightbox, lightboxImages, lightboxOpen, lightboxIndex, setLightboxOpen } = useLightbox();
+    const { openGalleryLightbox, lightboxImages, lightboxOpen, lightboxIndex, setLightboxOpen, setLightboxIndex } = useLightbox();
 
     const formatDate = (date: Date) => {
         return new Intl.DateTimeFormat("en-US", {
@@ -133,7 +133,7 @@ export const ImageGallery = () => {
                                                 height={512}
                                                 alt={firstImage.prompt}
                                                 className="w-full h-full object-cover cursor-pointer"
-                                                onClick={() => openGalleryLightbox(generatedImages, generationToken, 0)}
+                                                onClick={() => openGalleryLightbox(batch, generationToken, 0)}
                                             />
                                         )}
                                         {isBatch && (
@@ -232,7 +232,7 @@ export const ImageGallery = () => {
             <Lightbox
                 images={lightboxImages}
                 open={lightboxOpen}
-                onClose={() => setLightboxOpen(false)}
+                onClose={() => { setLightboxOpen(false); setLightboxIndex(0)}}
                 initialIndex={lightboxIndex}
                 onDownload={handleImageDownload}
             />

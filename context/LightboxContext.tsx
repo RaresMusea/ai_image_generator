@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { GeneratedImage } from "./ImageGeneratrorContext";
 
 interface LightboxContextProps {
@@ -10,7 +10,6 @@ interface LightboxContextProps {
     setLightboxIndex: (newLightboxIndex: number) => void;
     openGeneratedImagesLightbox: (index: number, generatedImages: GeneratedImage[]) => void;
     openGalleryLightbox: (generatedImages: GeneratedImage[], batchId: string, index: number) => void;
-    openTransformerGeneratorLightbox: (index: number) => void;
 };
 
 type LightboxSourcesProps = {
@@ -26,8 +25,17 @@ export const LightboxProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const [lightboxImages, setLightboxImages] = useState<LightboxSourcesProps[]>([])
     const [lightboxIndex, setLightboxIndex] = useState<number>(0);
 
+    useEffect(() => {
+        if (!lightboxOpen) {
+            setLightboxIndex(0);
+        }
+
+        if (lightboxImages.length < lightboxIndex) {
+            setLightboxIndex(0);
+        }
+    }, [lightboxOpen, lightboxIndex]);
+
     const openGeneratedImagesLightbox = (index: number = 0, generatedImages: GeneratedImage[]) => {
-        console.log(generatedImages);
         if (generatedImages.length === 0) return;
 
         setLightboxImages(
@@ -43,7 +51,7 @@ export const LightboxProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     const openGalleryLightbox = (generatedImages: GeneratedImage[], batchId: string, index: number = 0) => {
         const batch = generatedImages.filter((img) => img.generationToken === batchId);
-
+        console.log("BATCH", batch)
         setLightboxImages(
             batch.map((img) => ({
                 id: img.id,
@@ -56,10 +64,6 @@ export const LightboxProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setLightboxOpen(true);
     }
 
-    const openTransformerGeneratorLightbox = (index: number) => {
-
-    };
-
     return (
         <LightboxContext.Provider value={{
             lightboxOpen,
@@ -68,7 +72,6 @@ export const LightboxProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             setLightboxIndex,
             setLightboxImages,
             openGeneratedImagesLightbox,
-            openTransformerGeneratorLightbox,
             openGalleryLightbox,
             setLightboxOpen
         }}>

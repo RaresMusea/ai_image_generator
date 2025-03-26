@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useImageTransformer } from "../../../context/ImageTransformerContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Download, ImageIcon, Loader2, Maximize2, RefreshCw, SplitSquareVertical } from "lucide-react";
@@ -9,13 +8,21 @@ import { useImageGenerator } from "../../../context/ImageGeneratrorContext";
 import { Button } from "../ui/button";
 import Image from "next/image";
 import { getImageResolution } from "@/lib/ImageUtils";
+import { Lightbox } from "../ui/lightbox";
 
 export const ImageTransformerGenerator = () => {
-    const { uploadedImage, setUploadedImage, currentTransformationResult, sourceImageInputRef } = useImageTransformer();
-    const [showComparison, setShowComparison] = useState(false);
-    const [comparisonImage, setComparisonImage] = useState<string | undefined>(undefined);
-    const { openTransformerGeneratorLightbox } = useLightbox();
-    const { imageCount, setImageTransformPrompt, isGenerating } = useImageGenerator();
+    const { uploadedImage,
+        setUploadedImage,
+        showComparison,
+        currentTransformationResult,
+        sourceImageInputRef,
+        comparisonImage,
+        setComparisonImage,
+        setShowComparison,
+        handleTransformedImageDownload
+    } = useImageTransformer();
+    const { lightboxImages, lightboxIndex, lightboxOpen, setLightboxOpen, setLightboxIndex, openGeneratedImagesLightbox } = useLightbox();
+    const { imageCount, setImageTransformPrompt, isGenerating, generatedImages } = useImageGenerator();
 
     return (
         <Card className="h-fit">
@@ -51,7 +58,12 @@ export const ImageTransformerGenerator = () => {
                                                 src={comparisonImage || "/placeholder.svg"}
                                                 alt="Transformed image"
                                                 className="object-contain max-w-full max-h-full cursor-pointer"
-                                                onClick={() => openTransformerGeneratorLightbox(0)}
+                                                onClick={() => {
+                                                    const foundImage = generatedImages.find(i => i.url === comparisonImage);
+                                                    if (foundImage) {
+                                                        openGeneratedImagesLightbox(generatedImages.indexOf(foundImage), generatedImages);
+                                                    }
+                                                }}
                                             />
                                         </div>
                                         <span className="text-xs text-muted-foreground mt-1">Transformed</span>
@@ -65,7 +77,7 @@ export const ImageTransformerGenerator = () => {
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                onClick={() => openTransformerGeneratorLightbox(0)}
+                                                onClick={() => openGeneratedImagesLightbox(0, currentTransformationResult)}
                                                 className="h-8 px-2"
                                             >
                                                 <Maximize2 className="h-4 w-4 mr-1" />
@@ -78,7 +90,7 @@ export const ImageTransformerGenerator = () => {
                                                 <div
                                                     key={img.id}
                                                     className="bg-muted rounded-lg overflow-hidden aspect-square cursor-pointer"
-                                                    onClick={() => openTransformerGeneratorLightbox(index)}
+                                                    onClick={() => setComparisonImage(img.url)}
                                                 >
                                                     <Image
                                                         width={getImageResolution(img.size)?.width || 512}
@@ -92,16 +104,15 @@ export const ImageTransformerGenerator = () => {
                                         </div>
                                     </div>
                                 )}
-
                                 <div className="flex space-x-2 mt-4">
                                     <Button
                                         variant="outline"
                                         size="sm"
                                         className="flex-1"
-                                        onClick={() => { }}
+                                        onClick={() => handleTransformedImageDownload(comparisonImage)}
                                     >
                                         <Download className="h-3 w-3 mr-1" />
-                                        Download
+                                        Download Transformed
                                     </Button>
 
                                     <Button
@@ -132,7 +143,9 @@ export const ImageTransformerGenerator = () => {
                                         <p className="text-sm text-muted-foreground">Transforming your image...</p>
                                     </div>
                                 ) : (
-                                    <img
+                                    <Image
+                                        width={getImageResolution(uploadedImage)?.width || 512}
+                                        height={getImageResolution(uploadedImage)?.height || 512}
                                         src={uploadedImage || "/placeholder.svg"}
                                         alt="Source image"
                                         className="object-contain max-w-full max-h-full"
@@ -149,6 +162,13 @@ export const ImageTransformerGenerator = () => {
                         </div>
                     )}
             </CardContent>
+            <Lightbox
+                images={lightboxImages}
+                open={lightboxOpen}
+                onClose={() => { setLightboxOpen(false); setLightboxIndex(0) }}
+                initialIndex={lightboxIndex}
+                onDownload={handleTransformedImageDownload}
+            />
         </Card>
     );
 }

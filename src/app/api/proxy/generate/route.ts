@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import cuid from 'cuid';
 
 const PORT: string = '7861';
-const URL: string = `http://localhost:${PORT}`
+export const URL: string = `http://localhost:${PORT}`
 
 export async function POST(request: NextRequest) {
     const { prompt, size, seed, imageCount } = await request.json();
@@ -30,10 +30,14 @@ export async function POST(request: NextRequest) {
         return new NextResponse("Unable to perform image generation.", { status: 500 });
     }
 
-    console.log(response.data);
     const imagesBase64: string[] = response.data.images;
     const imagesDataUri = imagesBase64.map((i64: string) => `data:image/png;base64,${i64}`);
     const generationToken: string = cuid();
 
-    return NextResponse.json({ images: imagesDataUri, generationToken }, { status: 201 });
+    const imagesDataUriResponse = imagesDataUri.map(image => ({
+        id: cuid(),
+        url: image
+    }));
+
+    return NextResponse.json({ images: imagesDataUriResponse, generationToken }, { status: 201 });
 }
