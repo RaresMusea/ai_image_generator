@@ -7,8 +7,9 @@ const PORT: string = '7861';
 const url = `http://localhost:${PORT}`
 
 export async function POST(request: NextRequest) {
-    const { image, extension, imageTransformationPrompt, size, denoisingStrength, imageCount, resizeMode } = await request.json();
+    const { image, extension, prompt, size, denoisingStrength, imageCount, resizeMode } = await request.json();
 
+    console.log(`Prompt ${prompt}`);
     let imageUri = image;
 
     if (extension === 'jpg' || extension === 'jpeg') {
@@ -30,7 +31,7 @@ export async function POST(request: NextRequest) {
     const samples: number = Number.parseInt(imageCount);
     try {
         const response = await axios.post(`${url}/sdapi/v1/img2img`, {
-            prompt: imageTransformationPrompt,
+            prompt,
             init_images: [image],
             width: resolution.width,
             height: resolution.height,

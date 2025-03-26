@@ -22,7 +22,7 @@ export const ImageTransformerGenerator = () => {
         handleTransformedImageDownload
     } = useImageTransformer();
     const { lightboxImages, lightboxIndex, lightboxOpen, setLightboxOpen, setLightboxIndex, openGeneratedImagesLightbox } = useLightbox();
-    const { imageCount, setImageTransformPrompt, isGenerating, generatedImages } = useImageGenerator();
+    const { imageCount, isGenerating, generatedImages, imageTransformPromptRef } = useImageGenerator();
 
     return (
         <Card className="h-fit">
@@ -120,7 +120,7 @@ export const ImageTransformerGenerator = () => {
                                         size="sm"
                                         className="flex-1"
                                         onClick={() => {
-                                            setImageTransformPrompt("");
+                                            imageTransformPromptRef.current = '';
                                             setUploadedImage(undefined);
                                             setShowComparison(false);
                                             setComparisonImage(undefined);

@@ -25,16 +25,6 @@ export const LightboxProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const [lightboxImages, setLightboxImages] = useState<LightboxSourcesProps[]>([])
     const [lightboxIndex, setLightboxIndex] = useState<number>(0);
 
-    useEffect(() => {
-        if (!lightboxOpen) {
-            setLightboxIndex(0);
-        }
-
-        if (lightboxImages.length < lightboxIndex) {
-            setLightboxIndex(0);
-        }
-    }, [lightboxOpen, lightboxIndex]);
-
     const openGeneratedImagesLightbox = (index: number = 0, generatedImages: GeneratedImage[]) => {
         if (generatedImages.length === 0) return;
 

@@ -105,7 +105,7 @@ export const ImageGenerator = () => {
                                         height={getImageResolution(generatedImage)?.height || 512}
                                         src={generatedImage || "/placeholder.svg"}
                                         alt="Generated image"
-                                        onClick={() => openGeneratedImagesLightbox(0, generatedImages)}
+                                        onClick={() => openGeneratedImagesLightbox(0, multipleGenerated)}
                                         className="w-full h-full object-contain"
                                     />
                                 )}

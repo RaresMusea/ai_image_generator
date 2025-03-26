@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card"
 import { Label } from "../ui/label"
 import { ArrowRightLeft, CircleHelp, Loader2, Upload } from "lucide-react";
@@ -22,7 +22,7 @@ import { getImageExtension } from "@/lib/ImageUtils";
 
 export const ImageTransformer = () => {
     const [denoisingStrength, setDenoisingStrength] = useState<number>(0);
-    const { imageTransformPrompt, imageCount, generatedImages, size, isGenerating, setIsGenerating, setImageCount, setImageTransformPrompt, setSize, setGeneratedImages } = useImageGenerator();
+    const { imageTransformPromptRef, imageCount, generatedImages, size, isGenerating, setIsGenerating, setImageCount, setSize, setGeneratedImages } = useImageGenerator();
     const { uploadedImage, setUploadedImage, sourceImageInputRef, setComparisonImage, setCurrentTransformationResult, setShowComparison } = useImageTransformer();
     const [resizeMode, setResizeMode] = useState<string>('1');
     const [imageDetails, setImageDetails] = useState<File | undefined>();
@@ -74,13 +74,13 @@ export const ImageTransformer = () => {
         setComparisonImage(undefined);
 
         try {
-            const { data } = await axios.post("/api/proxy/transform", { image: uploadedImage, extension: getImageExtension(imageDetails!), imageTransformPrompt, size, denoisingStrength, imageCount, resizeMode });
+            const { data } = await axios.post("/api/proxy/transform", { image: uploadedImage, extension: getImageExtension(imageDetails!), prompt: imageTransformPromptRef.current, size, denoisingStrength, imageCount, resizeMode });
             if (data.images.length === 1) {
                 const newImage: GeneratedImage = {
                     id: Date.now().toString(),
                     generationToken: data.generationToken,
                     url: data.images[0],
-                    prompt: imageTransformPrompt!,
+                    prompt: imageTransformPromptRef.current,
                     timestamp: new Date(),
                     size: size || "512x512",
                     sourceImageUrl: uploadedImage
@@ -99,7 +99,7 @@ export const ImageTransformer = () => {
                         id: i.id,
                         generationToken: data.generationToken,
                         url: i.url,
-                        prompt: imageTransformPrompt || '',
+                        prompt: imageTransformPromptRef.current || '',
                         timestamp: new Date(),
                         size: size || '512x512',
                         sourceImageUrl: uploadedImage
@@ -145,8 +145,7 @@ export const ImageTransformer = () => {
                     <Label htmlFor="transformation-prompt">Image Transformation Prompt</Label>
                     <Textarea id="transformation-prompt"
                         placeholder="Specify the transformations to which the previously provided image should be subjected."
-                        value={imageTransformPrompt}
-                        onChange={(e) => setImageTransformPrompt(e.target.value)}
+                        onChange={(e) => imageTransformPromptRef.current = e.target.value}
                         className="min-h-[80px]"
                     >
                     </Textarea>
