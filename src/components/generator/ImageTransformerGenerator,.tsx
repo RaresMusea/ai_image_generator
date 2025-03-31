@@ -43,7 +43,8 @@ export const ImageTransformerGenerator = () => {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="flex flex-col items-center">
                                         <div className="bg-muted rounded-lg overflow-hidden w-full h-[200px] flex items-center justify-center">
-                                            <img
+                                            <Image
+                                                fill
                                                 src={uploadedImage || "/placeholder.svg"}
                                                 alt="Source image"
                                                 className="object-contain max-w-full max-h-full"
@@ -54,7 +55,8 @@ export const ImageTransformerGenerator = () => {
 
                                     <div className="flex flex-col items-center">
                                         <div className="bg-muted rounded-lg overflow-hidden w-full h-[200px] flex items-center justify-center">
-                                            <img
+                                            <Image
+                                                fill
                                                 src={comparisonImage || "/placeholder.svg"}
                                                 alt="Transformed image"
                                                 className="object-contain max-w-full max-h-full cursor-pointer"

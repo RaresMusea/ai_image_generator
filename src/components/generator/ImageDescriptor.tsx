@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card"
 import { Label } from "../ui/label";
@@ -21,7 +21,6 @@ export const ImageDescriptor = () => {
         imageCount,
         isGenerating,
         generatedImages,
-        multipleGenerated,
         setPrompt,
         setSize,
         setIsGenerating,

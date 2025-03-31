@@ -1,9 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { X, ChevronLeft, ChevronRight, Download, Section } from "lucide-react"
+import { X, ChevronLeft, ChevronRight, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import Image from "next/image"
 
 const globalStyles = `
 @keyframes fadeIn {
@@ -58,6 +59,26 @@ export function Lightbox({ images, open, onClose, initialIndex = 0, onDownload }
     const currentImage = currentIndex >= images.length ? images[0] : images[currentIndex];
     const [isClosing, setIsClosing] = React.useState(false)
 
+    const handleClose = React.useCallback(() => {
+        setIsClosing(true)
+        setTimeout(() => {
+            setIsClosing(false)
+            onClose()
+        }, 200)
+    }, [onClose]);
+
+    const navigateNext = React.useCallback(() => {
+        if (currentIndex < images.length - 1) {
+            setCurrentIndex(currentIndex + 1)
+        }
+    }, [currentIndex, images.length]);
+
+    const navigatePrev = React.useCallback(() => {
+        if (currentIndex > 0) {
+            setCurrentIndex(currentIndex - 1)
+        }
+    }, [currentIndex]);
+
     React.useEffect(() => {
         const styleElement = document.createElement("style")
         styleElement.innerHTML = globalStyles
@@ -66,15 +87,7 @@ export function Lightbox({ images, open, onClose, initialIndex = 0, onDownload }
         return () => {
             document.head.removeChild(styleElement)
         }
-    }, [])
-
-    const handleClose = () => {
-        setIsClosing(true)
-        setTimeout(() => {
-            setIsClosing(false)
-            onClose()
-        }, 200)
-    }
+    }, [handleClose]);
 
     React.useEffect(() => {
         if (!open) return
@@ -95,19 +108,8 @@ export function Lightbox({ images, open, onClose, initialIndex = 0, onDownload }
 
         window.addEventListener("keydown", handleKeyDown)
         return () => window.removeEventListener("keydown", handleKeyDown)
-    }, [open, currentIndex, images.length])
+    }, [open, currentIndex, images.length, handleClose, navigateNext, navigatePrev]);
 
-    const navigateNext = () => {
-        if (currentIndex < images.length - 1) {
-            setCurrentIndex(currentIndex + 1)
-        }
-    }
-
-    const navigatePrev = () => {
-        if (currentIndex > 0) {
-            setCurrentIndex(currentIndex - 1)
-        }
-    }
 
     if (!open && !isClosing) return null
 
@@ -144,7 +146,8 @@ export function Lightbox({ images, open, onClose, initialIndex = 0, onDownload }
 
                 <div className="flex-1 relative overflow-hidden">
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <img
+                        <Image
+                            fill
                             src={currentImage.url || "/placeholder.svg"}
                             alt={currentImage.prompt || "Image"}
                             className="max-h-full max-w-full object-contain"

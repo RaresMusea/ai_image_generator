@@ -110,7 +110,8 @@ export const ImageGallery = () => {
                                                     {batch.map((image, index) => (
                                                         <CarouselItem key={image.id} className="h-full aspect-square">
                                                             <div className="h-full relative">
-                                                                <img
+                                                                <Image
+                                                                    fill
                                                                     src={image.url || "/placeholder.svg"}
                                                                     alt={image.prompt}
                                                                     className="w-full h-full object-cover cursor-pointer"

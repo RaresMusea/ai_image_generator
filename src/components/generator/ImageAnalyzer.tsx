@@ -8,8 +8,9 @@ import { Label } from "../ui/label";
 import { ImageIcon, Loader2, RefreshCw, Upload } from "lucide-react";
 import { Button } from "../ui/button";
 import axios, { AxiosError } from "axios";
-import { getImageExtension } from "@/lib/ImageUtils";
+import { getImageExtension, getImageResolution } from "@/lib/ImageUtils";
 import { useImageGenerator } from "../../../context/ImageGeneratrorContext";
+import Image from "next/image";
 
 export const MAXIMUM_FILE_UPLOAD = 13 * 1024 * 1024;
 
@@ -172,7 +173,9 @@ export const ImageAnalyzer = () => {
 
                     <div className="bg-muted rounded-lg overflow-hidden flex items-center justify-center lg:h-[320px] h-auto aspect-square lg:aspect-auto">
                         {uploadedImage ? (
-                            <img
+                            <Image
+                                width={(getImageResolution(uploadedImage)?.width || 512)}
+                                height={(getImageResolution(uploadedImage)?.height || 512)}
                                 src={uploadedImage || "/placeholder.svg"}
                                 alt="Uploaded image"
                                 className="w-full h-full object-contain"

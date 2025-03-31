@@ -8,8 +8,6 @@ const url = `http://localhost:${PORT}`
 
 export async function POST(request: NextRequest) {
     const { image, extension, prompt, size, denoisingStrength, imageCount, resizeMode } = await request.json();
-
-    console.log(`Prompt ${prompt}`);
     let imageUri = image;
 
     if (extension === 'jpg' || extension === 'jpeg') {
@@ -32,7 +30,7 @@ export async function POST(request: NextRequest) {
     try {
         const response = await axios.post(`${url}/sdapi/v1/img2img`, {
             prompt,
-            init_images: [image],
+            init_images: [imageUri],
             width: resolution.width,
             height: resolution.height,
             batch_size: samples,
@@ -55,7 +53,7 @@ export async function POST(request: NextRequest) {
             url: i
         }))
 
-        return NextResponse.json({ images: imagesDataUri, generationToken }, { status: 201 });
+        return NextResponse.json({ images: imagesDataResponse, generationToken }, { status: 201 });
     }
     catch (err) {
         console.error(err);
