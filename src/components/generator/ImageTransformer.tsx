@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card"
 import { Label } from "../ui/label"
-import { ArrowRightLeft, CircleHelp, Loader2, Upload } from "lucide-react";
+import { ArrowRightLeft, CircleHelp, ImageIcon, Loader2, Upload } from "lucide-react";
 import { Textarea } from "../ui/textarea";
 import { GeneratedImage, useImageGenerator } from "../../../context/ImageGeneratrorContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
@@ -22,10 +22,9 @@ import { getImageExtension } from "@/lib/ImageUtils";
 
 export const ImageTransformer = () => {
     const [denoisingStrength, setDenoisingStrength] = useState<number>(0);
-    const { imageTransformPromptRef, imageCount, generatedImages, size, isGenerating, setIsGenerating, setImageCount, setSize, setGeneratedImages } = useImageGenerator();
-    const { uploadedImage, setUploadedImage, sourceImageInputRef, setComparisonImage, setCurrentTransformationResult, setShowComparison } = useImageTransformer();
+    const { imageTransformPrompt, setImageTransformPrompt, imageCount, generatedImages, size, isGenerating, setIsGenerating, setImageCount, setSize, setGeneratedImages, imageDetails, setImageDetails } = useImageGenerator();
+    const { uploadedTransformationImage, setUploadedTransformationImage, sourceImageInputRef, setComparisonImage, setCurrentTransformationResult, setShowComparison } = useImageTransformer();
     const [resizeMode, setResizeMode] = useState<string>('1');
-    const [imageDetails, setImageDetails] = useState<File | undefined>();
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file: File | undefined = e.target.files?.[0];
@@ -55,7 +54,7 @@ export const ImageTransformer = () => {
             const base64Result: string = event.target?.result as string;
             const cleanBase64 = base64Result;
 
-            setUploadedImage(cleanBase64);
+            setUploadedTransformationImage(cleanBase64);
             toast.success("Image uploaded successfully!", {
                 description: "Your image is ready to be analyzed.",
             })
@@ -66,7 +65,7 @@ export const ImageTransformer = () => {
 
     const handleImageTransform = async () => {
 
-        if (!imageDetails || !uploadedImage) {
+        if (!uploadedTransformationImage) {
             toast.error('Error', { description: 'Invalid image!' });
         }
 
@@ -74,16 +73,16 @@ export const ImageTransformer = () => {
         setComparisonImage(undefined);
 
         try {
-            const { data } = await axios.post("/api/proxy/transform", { image: uploadedImage, extension: getImageExtension(imageDetails!), prompt: imageTransformPromptRef.current, size, denoisingStrength, imageCount, resizeMode });
+            const { data } = await axios.post("/api/proxy/transform", { image: uploadedTransformationImage, extension: getImageExtension(imageDetails!) || 'png', prompt: imageTransformPrompt, size, denoisingStrength, imageCount, resizeMode });
             if (data.images.length === 1) {
                 const newImage: GeneratedImage = {
-                    id: Date.now().toString(),
+                    id: data.images[0].id,
                     generationToken: data.generationToken,
-                    url: data.images[0],
-                    prompt: imageTransformPromptRef.current,
+                    url: data.images[0].url,
+                    prompt: imageTransformPrompt || '',
                     timestamp: new Date(),
                     size: size || "512x512",
-                    sourceImageUrl: uploadedImage
+                    sourceImageUrl: uploadedTransformationImage
                 };
 
                 setComparisonImage(newImage.url);
@@ -99,10 +98,10 @@ export const ImageTransformer = () => {
                         id: i.id,
                         generationToken: data.generationToken,
                         url: i.url,
-                        prompt: imageTransformPromptRef.current || '',
+                        prompt: imageTransformPrompt || '',
                         timestamp: new Date(),
                         size: size || '512x512',
-                        sourceImageUrl: uploadedImage
+                        sourceImageUrl: uploadedTransformationImage
                     })
                 });
 
@@ -132,12 +131,21 @@ export const ImageTransformer = () => {
                 <div className="space-y-3">
                     <Label htmlFor="source-image-uploader">Source Image</Label>
                     <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
-                        <input type="file" id="source-image-uploader" className="hidden" onChange={handleImageUpload} ref={sourceImageInputRef} />
-                        <Label htmlFor="source-image-uploader" className="flex flex-col items-center justify-center cursor-pointer">
-                            <Upload className="h-10 w-10 text-muted-foreground mb-2" />
-                            <span className="text-sm font-medium"> Click to upload an image</span>
-                            <span className="text-xs text-muted-foreground mt-1">PNG, GIF, or WEBP, up to 10MB</span>
-                        </Label>
+                        {uploadedTransformationImage ?
+                            <Label htmlFor="iamge-upload"
+                                className="flex flex-col items-center justify-center cursor-pointer">
+                                <ImageIcon className="h-10 w-10 text-muted-foreground mb-2" />
+                                <span className="text-sm font-medium">Uploaded image: <b>{imageDetails?.name || 'Image inferred from Analyzer'}</b></span>
+                            </Label> :
+                            <>
+                                <input type="file" id="source-image-uploader" className="hidden" onChange={handleImageUpload} ref={sourceImageInputRef} />
+                                <Label htmlFor="source-image-uploader" className="flex flex-col items-center justify-center cursor-pointer">
+                                    <Upload className="h-10 w-10 text-muted-foreground mb-2" />
+                                    <span className="text-sm font-medium"> Click to upload an image</span>
+                                    <span className="text-xs text-muted-foreground mt-1">PNG, GIF, or WEBP, up to 10MB</span>
+                                </Label>
+                            </>
+                        }
                     </div>
                 </div>
 
@@ -145,7 +153,8 @@ export const ImageTransformer = () => {
                     <Label htmlFor="transformation-prompt">Image Transformation Prompt</Label>
                     <Textarea id="transformation-prompt"
                         placeholder="Specify the transformations to which the previously provided image should be subjected."
-                        onChange={(e) => imageTransformPromptRef.current = e.target.value}
+                        value={imageTransformPrompt}
+                        onChange={(e) => setImageTransformPrompt(e.target.value)}
                         className="min-h-[80px]"
                     >
                     </Textarea>
@@ -156,7 +165,7 @@ export const ImageTransformer = () => {
                         <div className="flex items-center">
                             <Label htmlFor="seed">Denoising Strength</Label>
                             <Tooltip>
-                                <TooltipTrigger>
+                                <TooltipTrigger asChild>
                                     <span><CircleHelp className="ml-2 w-5 h-5 bg-accent rounded-full text-white" /></span>
                                 </TooltipTrigger>
                                 <TooltipContent><p className="text-xs">Controls how much the image is altered. Lower values keep more details, higher values generate more changes.</p></TooltipContent>
@@ -230,7 +239,7 @@ export const ImageTransformer = () => {
                 <div className="flex flex-col space-y-2">
                     <Button
                         onClick={handleImageTransform}
-                        disabled={isGenerating || !uploadedImage?.trim()}
+                        disabled={isGenerating || !uploadedTransformationImage?.trim()}
                         className="w-full"
                     >
                         {isGenerating ? (
@@ -249,7 +258,7 @@ export const ImageTransformer = () => {
                     <Button
                         variant="outline"
                         onClick={() => { }}
-                        disabled={!uploadedImage}
+                        disabled={!uploadedTransformationImage || isGenerating}
                         className="w-full"
                     >
                         Reset

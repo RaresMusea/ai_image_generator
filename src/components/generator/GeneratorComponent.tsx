@@ -10,7 +10,6 @@ import { useImageGenerator } from "../../../context/ImageGeneratrorContext";
 import { LightboxProvider } from "../../../context/LightboxContext";
 import { ImageTransformer } from "./ImageTransformer";
 import { ImageTransformerGenerator } from "./ImageTransformerGenerator,";
-import { ImageTransformerProvider } from "../../../context/ImageTransformerContext";
 
 export const GeneratorComponent = () => {
     const { activeTab, setActiveTab, generatedImages, imageCount } = useImageGenerator();
@@ -35,10 +34,8 @@ export const GeneratorComponent = () => {
                     </TabsContent>
                     <TabsContent value="transform" className="mt-0">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                            <ImageTransformerProvider>
-                                <ImageTransformer />
-                                <ImageTransformerGenerator />
-                            </ImageTransformerProvider>
+                            <ImageTransformer />
+                            <ImageTransformerGenerator />
                         </div>
                     </TabsContent>
                     <TabsContent value="upload" className="mt-0">

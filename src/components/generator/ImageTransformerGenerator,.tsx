@@ -11,8 +11,8 @@ import { getImageResolution } from "@/lib/ImageUtils";
 import { Lightbox } from "../ui/lightbox";
 
 export const ImageTransformerGenerator = () => {
-    const { uploadedImage,
-        setUploadedImage,
+    const { uploadedTransformationImage,
+        setUploadedTransformationImage,
         showComparison,
         currentTransformationResult,
         sourceImageInputRef,
@@ -22,7 +22,7 @@ export const ImageTransformerGenerator = () => {
         handleTransformedImageDownload
     } = useImageTransformer();
     const { lightboxImages, lightboxIndex, lightboxOpen, setLightboxOpen, setLightboxIndex, openGeneratedImagesLightbox } = useLightbox();
-    const { imageCount, isGenerating, generatedImages, imageTransformPromptRef } = useImageGenerator();
+    const { imageCount, isGenerating, generatedImages, setImageTransformPrompt } = useImageGenerator();
 
     return (
         <Card className="h-fit">
@@ -32,7 +32,7 @@ export const ImageTransformerGenerator = () => {
             </CardHeader>
             <CardContent className="pt-2">
                 {
-                    uploadedImage ? (
+                    uploadedTransformationImage ? (
                         showComparison && comparisonImage ? (
                             <div className="space-y-4">
                                 <div className="flex items-center justify-center gap-2 mb-2">
@@ -44,8 +44,10 @@ export const ImageTransformerGenerator = () => {
                                     <div className="flex flex-col items-center">
                                         <div className="bg-muted rounded-lg overflow-hidden w-full h-[200px] flex items-center justify-center">
                                             <Image
-                                                fill
-                                                src={uploadedImage || "/placeholder.svg"}
+                                                width={512}
+                                                height={512}
+                                                onClick={() => {}}
+                                                src={uploadedTransformationImage || "/placeholder.svg"}
                                                 alt="Source image"
                                                 className="object-contain max-w-full max-h-full"
                                             />
@@ -56,7 +58,8 @@ export const ImageTransformerGenerator = () => {
                                     <div className="flex flex-col items-center">
                                         <div className="bg-muted rounded-lg overflow-hidden w-full h-[200px] flex items-center justify-center">
                                             <Image
-                                                fill
+                                                width={512}
+                                                height={512}
                                                 src={comparisonImage || "/placeholder.svg"}
                                                 alt="Transformed image"
                                                 className="object-contain max-w-full max-h-full cursor-pointer"
@@ -122,8 +125,8 @@ export const ImageTransformerGenerator = () => {
                                         size="sm"
                                         className="flex-1"
                                         onClick={() => {
-                                            imageTransformPromptRef.current = '';
-                                            setUploadedImage(undefined);
+                                            setImageTransformPrompt('');
+                                            setUploadedTransformationImage(undefined);
                                             setShowComparison(false);
                                             setComparisonImage(undefined);
                                             if (sourceImageInputRef.current) {
@@ -146,9 +149,9 @@ export const ImageTransformerGenerator = () => {
                                     </div>
                                 ) : (
                                     <Image
-                                        width={getImageResolution(uploadedImage)?.width || 512}
-                                        height={getImageResolution(uploadedImage)?.height || 512}
-                                        src={uploadedImage || "/placeholder.svg"}
+                                        width={getImageResolution(uploadedTransformationImage)?.width || 512}
+                                        height={getImageResolution(uploadedTransformationImage)?.height || 512}
+                                        src={uploadedTransformationImage || "/placeholder.svg"}
                                         alt="Source image"
                                         className="object-contain max-w-full max-h-full"
                                     />

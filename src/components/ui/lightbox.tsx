@@ -54,9 +54,7 @@ interface LightboxProps {
 
 export function Lightbox({ images, open, onClose, initialIndex = 0, onDownload }: LightboxProps) {
     const [currentIndex, setCurrentIndex] = React.useState(initialIndex)
-    console.log("IMAGES", images);
-    console.log("CURRENT IDX", currentIndex);
-    const currentImage = currentIndex >= images.length ? images[0] : images[currentIndex];
+    const currentImage = images[currentIndex] || images[0];
     const [isClosing, setIsClosing] = React.useState(false)
 
     const handleClose = React.useCallback(() => {
@@ -109,6 +107,12 @@ export function Lightbox({ images, open, onClose, initialIndex = 0, onDownload }
         window.addEventListener("keydown", handleKeyDown)
         return () => window.removeEventListener("keydown", handleKeyDown)
     }, [open, currentIndex, images.length, handleClose, navigateNext, navigatePrev]);
+
+    React.useEffect(() => {
+        if (open) {
+            setCurrentIndex(initialIndex)
+        }
+    }, [open, initialIndex])
 
 
     if (!open && !isClosing) return null
