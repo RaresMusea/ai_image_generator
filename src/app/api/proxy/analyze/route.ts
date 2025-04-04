@@ -8,18 +8,17 @@ const URL: string = `http://localhost:${PORT}`;
 export async function POST(request: NextRequest): Promise<NextResponse> {
     let { image, extension } = await request.json();
     const imageFormat = `data:image/${extension};base64,`;
-    let imageUri = image;
 
     if (extension === 'jpg') {
         extension = 'jpeg';
     }
 
     if (!image.includes(imageFormat)) {
-        imageUri = `data:image/${extension};base64,` + imageUri;
+        image = `data:image/${extension};base64,` + image;
     }
 
     const response = await axios.post(`${URL}/sdapi/v1/interrogate`, {
-        image: imageUri,
+        image: image,
         model: 'clip'
     });
 

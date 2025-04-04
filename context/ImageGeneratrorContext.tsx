@@ -1,10 +1,13 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, RefObject, useContext, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface ImageGeneratorContextProps {
     prompt: string | undefined;
+    imageTransformPrompt: string | undefined;
     size: string | undefined;
     generatedImage :string | undefined;
+    imageDetails: File | undefined;
+    setImageDetails: (newImageDetails: File | undefined) => void;
     generatedImages: GeneratedImage[];
     activeTab: string;
     isGenerating: boolean;
@@ -19,6 +22,7 @@ interface ImageGeneratorContextProps {
     setImageCount: (newImageCount: string) => void;
     setMultipleGenerated: (newArray: GeneratedImage[]) => void;
     handleImageDownload: (url: string) => void;
+    setImageTransformPrompt: (newImageTransformPrompt: string | undefined) => void;
 };
 
 export type GeneratedImage = {
@@ -28,6 +32,7 @@ export type GeneratedImage = {
     prompt: string
     timestamp: Date
     size: string
+    sourceImageUrl?: string
 };
 
 const ImageGeneratorContext = createContext<ImageGeneratorContextProps | undefined>(undefined);
@@ -41,6 +46,9 @@ export const ImageGeneratorProvider: React.FC<{children: React.ReactNode}> = ({c
         const [isGenerating, setIsGenerating] = useState<boolean>(false);
         const [imageCount, setImageCount] = useState<string>("1");
         const [multipleGenerated, setMultipleGenerated] = useState<GeneratedImage[]>([]);
+        const [imageTransformPrompt, setImageTransformPrompt] = useState<string | undefined>('');
+        const [imageDetails, setImageDetails] = useState<File | undefined>();
+
 
         useEffect(() => {
             if (imageCount !== "1" && generatedImage) {
@@ -49,8 +57,7 @@ export const ImageGeneratorProvider: React.FC<{children: React.ReactNode}> = ({c
         }, [imageCount]);
 
         const handleImageDownload = (imageUrl: string) => {
-            console.warn("IMAGE URL", imageUrl);
-            if (generatedImage) {
+            if (imageUrl) {
                 const link = document.createElement("a");
                 link.href = imageUrl;
                 link.download = `generated-image-${Date.now()}.png`;
@@ -65,6 +72,9 @@ export const ImageGeneratorProvider: React.FC<{children: React.ReactNode}> = ({c
     return (
         <ImageGeneratorContext.Provider value={{
             prompt,
+            imageDetails,
+            setImageDetails,
+            imageTransformPrompt,
             size,
             generatedImage,
             generatedImages,
@@ -80,6 +90,7 @@ export const ImageGeneratorProvider: React.FC<{children: React.ReactNode}> = ({c
             setActiveTab,
             setImageCount,
             setMultipleGenerated,
+            setImageTransformPrompt,
             handleImageDownload
         }}>
             {children}
