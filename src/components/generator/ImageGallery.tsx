@@ -14,7 +14,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 
 export const ImageGallery = () => {
     const { generatedImages, setActiveTab, setPrompt, setGeneratedImage, setGeneratedImages, setImageCount, setSize, handleImageDownload, setMultipleGenerated } = useImageGenerator();
-    const { openGalleryLightbox, lightboxImages, lightboxOpen, lightboxIndex, setLightboxOpen, setLightboxIndex } = useLightbox();
+    const { openGalleryLightbox, openGalleryLightboxSingleItem, lightboxImages, lightboxOpen, lightboxIndex, setLightboxOpen} = useLightbox();
 
     const formatDate = (date: Date) => {
         return new Intl.DateTimeFormat("en-US", {
@@ -110,7 +110,8 @@ export const ImageGallery = () => {
                                                     {batch.map((image, index) => (
                                                         <CarouselItem key={image.id} className="h-full aspect-square">
                                                             <div className="h-full relative">
-                                                                <img
+                                                                <Image
+                                                                    fill
                                                                     src={image.url || "/placeholder.svg"}
                                                                     alt={image.prompt}
                                                                     className="w-full h-full object-cover cursor-pointer"
@@ -133,7 +134,7 @@ export const ImageGallery = () => {
                                                 height={512}
                                                 alt={firstImage.prompt}
                                                 className="w-full h-full object-cover cursor-pointer"
-                                                onClick={() => openGalleryLightbox(batch, generationToken, 0)}
+                                                onClick={() => openGalleryLightboxSingleItem(firstImage)}
                                             />
                                         )}
                                         {isBatch && (
@@ -232,7 +233,7 @@ export const ImageGallery = () => {
             <Lightbox
                 images={lightboxImages}
                 open={lightboxOpen}
-                onClose={() => { setLightboxOpen(false); setLightboxIndex(0)}}
+                onClose={() => { setLightboxOpen(false) }}
                 initialIndex={lightboxIndex}
                 onDownload={handleImageDownload}
             />

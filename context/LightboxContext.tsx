@@ -10,6 +10,7 @@ interface LightboxContextProps {
     setLightboxIndex: (newLightboxIndex: number) => void;
     openGeneratedImagesLightbox: (index: number, generatedImages: GeneratedImage[]) => void;
     openGalleryLightbox: (generatedImages: GeneratedImage[], batchId: string, index: number) => void;
+    openGalleryLightboxSingleItem: (generatedImage: GeneratedImage) => void;
 };
 
 type LightboxSourcesProps = {
@@ -26,7 +27,10 @@ export const LightboxProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const [lightboxIndex, setLightboxIndex] = useState<number>(0);
 
     const openGeneratedImagesLightbox = (index: number = 0, generatedImages: GeneratedImage[]) => {
+        console.log("GENERATED IMAGES INDEX", index);
         if (generatedImages.length === 0) return;
+
+        setLightboxIndex(index);
 
         setLightboxImages(
             generatedImages.map((img) => ({
@@ -35,7 +39,6 @@ export const LightboxProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 prompt: img.prompt,
             })),
         )
-        setLightboxIndex(index)
         setLightboxOpen(true);
     }
 
@@ -54,6 +57,20 @@ export const LightboxProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setLightboxOpen(true);
     }
 
+    const openGalleryLightboxSingleItem = (generatedImage: GeneratedImage) => {
+        console.log("Generated Image", generatedImage);
+        if (generatedImage) {
+            setLightboxImages([
+                {
+                    id: generatedImage.id,
+                    url: generatedImage.url,
+                    prompt: generatedImage.prompt,
+                },
+            ]);
+            setLightboxOpen(true);
+        }
+    }
+
     return (
         <LightboxContext.Provider value={{
             lightboxOpen,
@@ -63,6 +80,7 @@ export const LightboxProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             setLightboxImages,
             openGeneratedImagesLightbox,
             openGalleryLightbox,
+            openGalleryLightboxSingleItem,
             setLightboxOpen
         }}>
             {children}

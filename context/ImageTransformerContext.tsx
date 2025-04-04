@@ -3,11 +3,11 @@ import { GeneratedImage } from "./ImageGeneratrorContext";
 import { toast } from "sonner";
 
 interface ImageTransformerContextProps {
-    uploadedImage: string | undefined;
+    uploadedTransformationImage: string | undefined;
     currentTransformationResult: GeneratedImage[];
     comparisonImage: string | undefined;
     showComparison: boolean;
-    setUploadedImage: (newUploadedImage: string | undefined) => void;
+    setUploadedTransformationImage: (newUploadedImage: string | undefined) => void;
     setCurrentTransformationResult: (newTransformationResult: GeneratedImage[]) => void;
     setComparisonImage: (newComparisonImage: string | undefined) => void;
     setShowComparison: (state: boolean) => void;
@@ -18,7 +18,7 @@ interface ImageTransformerContextProps {
 const ImageTransformerContext = createContext<ImageTransformerContextProps | undefined>(undefined);
 
 export const ImageTransformerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [uploadedImage, setUploadedImage] = useState<string | undefined>(undefined);
+    const [uploadedTransformationImage, setUploadedTransformationImage] = useState<string | undefined>(undefined);
     const [currentTransformationResult, setCurrentTransformationResult] = useState<GeneratedImage[]>([]);
     const [comparisonImage, setComparisonImage] = useState<string | undefined>(undefined);
     const sourceImageInputRef = useRef<HTMLInputElement>(null);
@@ -39,11 +39,11 @@ export const ImageTransformerProvider: React.FC<{ children: React.ReactNode }> =
 
     return (
         <ImageTransformerContext.Provider value={{
-            uploadedImage,
+            uploadedTransformationImage,
             currentTransformationResult,
             showComparison,
             comparisonImage,
-            setUploadedImage,
+            setUploadedTransformationImage,
             setCurrentTransformationResult,
             setShowComparison,
             setComparisonImage,
